@@ -126,7 +126,7 @@ const Header = () => {
     navigate("/login");
   };
   return (
-    <div className="bg-[#120c66] text-white pt-5">
+    <div className=" text-black pt-5">
       <div className="flex justify-between">
         <div className="lg:hidden ">
           <div className="py-3 pl-4">

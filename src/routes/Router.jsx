@@ -19,6 +19,9 @@ import ResetPass from "../Auth/ResetPass";
 import Notification from "../page/Notification/Notification";
 import About from "../page/Settings/About";
 import Login from "../Auth/Login";
+import Order from "../page/order/Order";
+import Banner from "../page/bannar/Banner";
+import SupportTab from "../page/support/SupportTab";
 
 
 export const router = createBrowserRouter([
@@ -57,6 +60,18 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/Subscription",
         element: <Subscription></Subscription>,
+      },
+        {
+        path: "/dashboard/order",
+        element: <Order></Order>
+      },
+       {
+        path: "/dashboard/banner",
+        element: <Banner></Banner>
+      },
+      {
+        path: "/dashboard/support",
+        element: <SupportTab></SupportTab>
       },
       {
         path: "/dashboard/Settings/profile",

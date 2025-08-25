@@ -7,22 +7,29 @@ import user from "../../assets/routerImg/user.png";
 import logo from "../../assets/header/logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { FaChevronRight } from "react-icons/fa";
+import { FaChevronRight, FaHome } from "react-icons/fa";
 import { IoIosLogIn } from "react-icons/io";
 import { logout } from "../../page/redux/features/auth/authSlice";
 import { useDispatch } from "react-redux";
+import { FiUser } from "react-icons/fi";
+import { FaBorderNone } from "react-icons/fa6";
+import { FaBorderAll } from "react-icons/fa";
+import { MdContactSupport } from "react-icons/md";
+import { TbCategory2 } from "react-icons/tb";
+
+import { IoSettingsOutline } from "react-icons/io5";
 
 const items = [
   {
     key: "dashboard",
     label: "Dashboard",
-    icon: dashboard,
+    icon: <FaHome />,
     link: "/",
   },
   {
     key: "userManagement",
     label: "User Management",
-    icon: user,
+    icon: <FiUser />,
     link: "/dashboard/UserManagement",
   },
 
@@ -31,7 +38,7 @@ const items = [
   {
     key: "categoriesManagement",
     label: "Categories Management",
-    icon: categorie,
+    icon: <TbCategory2 />,
     link: "/dashboard/CategoriesManagement/Categories",
     children: [
       {
@@ -46,16 +53,29 @@ const items = [
       },
     ],
   },
-  {
-    key: "subscription",
-    label: "Subscription",
-    icon: subscription,
-    link: "/dashboard/Subscription",
+    {
+    key: "order",
+    label: "Order",
+    icon: <FaBorderNone />,
+    link: "/dashboard/order",
   },
+  {
+    key: "banner",
+    label: "Banner Add",
+    icon: <FaBorderAll />,
+    link: "/dashboard/banner",
+  },
+  {
+    key: "support",
+    label: "Support",
+    icon: <MdContactSupport />,
+    link: "/dashboard/support",
+  },
+ 
   {
     key: "settings",
     label: "Settings",
-    icon: settings,
+    icon: <IoSettingsOutline />,
     link: "/dashboard/Settings/profile",
     children: [
       {
@@ -138,10 +158,10 @@ const SidBar = () => {
   };
 
   return (
-    <div className="custom-sidebar h-[100vh] bg-[#120c66]">
+    <div className="custom-sidebar h-[100vh] ">
       
       <div className="custom-sidebar-logo flex justify-center">
-        <img src={logo} alt="Logo" className="w-[160px]" />
+      <h1 className="text-4xl font-bold text-red-600 py-6">Shs<span>o</span>pflo</h1>
       </div>
       <div className="menu-items">
         {items.map((item) => {
@@ -163,7 +183,7 @@ const SidBar = () => {
                 to={item.link}
                 className={`menu-item my-4 mx-5 py-3 px-3 flex items-center cursor-pointer ${
                   selectedKey === item.key || isSettingsActive || isCreatorActive || isCategoriesActive
-                    ? "bg-[#bb3538] text-white rounded-md"
+                    ? "bg-[#E63946] text-white rounded-md"
                     : "bg-white rounded-md hover:bg-gray-200"
                 }`}
                 onClick={(e) => {
@@ -175,7 +195,8 @@ const SidBar = () => {
                   }
                 }}
               >
-                <img src={item.icon} alt={item.label} className="w-5 h-5 mr-3" />
+                <h1  className="w-5 mr-2">{item.icon}</h1>
+                
                 <span className="block w-full ">{item.label}</span>
 
                 {/* Show dropdown arrow if children exist */}
@@ -207,7 +228,7 @@ const SidBar = () => {
                       to={child.link}
                       className={`menu-item p-4 flex items-center cursor-pointer ${
                         selectedKey === child.key
-                          ? "bg-[#bb3538] text-white"
+                          ? "bg-[#E63946] text-white"
                           : "hover:bg-gray-200"
                       }`}
                       onClick={() => {
@@ -229,7 +250,7 @@ const SidBar = () => {
       <div className="  w-full p-4 px-5">
         <button
           onClick={handleLogout}
-          className="w-full flex bg-[#fa16ef] text-white text-start rounded-md  p-3"
+          className="w-full flex  text-black text-start rounded-md  p-3"
         >
           <span className="text-2xl">
             <IoIosLogIn />
