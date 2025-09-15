@@ -3,7 +3,37 @@
 @tailwind utilities;
 
 
+/* table head color change */
+.custom-table .ant-table-thead > tr > th {
+  background-color: #fff1f1; /* slate-800 */
+  color: black;
+  font-weight: 600;
+  padding: 15px;
+}
+/* image upload folder design  */
+:where(.css-dev-only-do-not-override-49qm).ant-upload-wrapper.ant-upload-picture-card-wrapper .ant-upload.ant-upload-select, :where(.css-dev-only-do-not-override-49qm).ant-upload-wrapper.ant-upload-picture-circle-wrapper .ant-upload.ant-upload-select {
+    width: 100%;
+    height: 200px;
+    text-align: center;
+    vertical-align: top;
+    background-color: rgba(0, 0, 0, 0.02);
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
 
+:where(.css-dev-only-do-not-override-49qm).ant-table-wrapper .ant-table-thead >tr>th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before, :where(.css-dev-only-do-not-override-49qm).ant-table-wrapper .ant-table-thead >tr>td:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 0;
+    width: 1px;
+    height: 1.6em;
+    background-color: #d8212100;
+    transform: translateY(-50%);
+    transition: background-color 0.2s;
+    content: "";
+}
 
 .children-menu {
   overflow: hidden;

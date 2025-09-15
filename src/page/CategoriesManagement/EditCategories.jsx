@@ -1,21 +1,21 @@
-import { Form, Input, Modal, Spin, Upload } from "antd";
+import { Form, Input, message, Modal, Spin, Upload } from "antd";
 import React, { useEffect, useState } from "react";
-// import { useUpdateCategoryMutation } from "../redux/api/productManageApi";
+import { useUpdateCategoryMutation } from "../redux/api/categoryApi";
+import { imageUrl } from "../redux/api/baseApi";
 
 const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
-  console.log("Selected Category:", selectedCategory);
-
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  // const [updateCategory] = useUpdateCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
 
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
+  // ✅ Whenever modal opens, fill default data again
   useEffect(() => {
-    if (selectedCategory) {
+    if (editModal && selectedCategory) {
       form.setFieldsValue({
         name: selectedCategory?.name,
       });
@@ -25,11 +25,11 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
           uid: "-1",
           name: "category-image.png",
           status: "done",
-          url: selectedCategory?.category_image || "https://via.placeholder.com/150",
+          url: `${imageUrl}${selectedCategory?.imageUrl}`,
         },
       ]);
     }
-  }, [selectedCategory, form]);
+  }, [editModal, selectedCategory, form]);
 
   const onPreview = async (file) => {
     let src = file.url;
@@ -53,43 +53,22 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
   };
 
   const handleSubmit = async (values) => {
-    console.log("Form values:", values);
     setLoading(true);
-
     try {
-      // Dummy update logic
-      const dummyData = {
-        id: selectedCategory?.key || 1,
-        name: values.name,
-        category_image: fileList.map((file) => file.url || file.name),
-      };
-      console.log("Dummy update data:", dummyData);
-
-      setTimeout(() => {
-        alert("Category updated successfully (dummy)!");
-        setEditModal(false);
-        form.resetFields();
-        setFileList([]);
-        setLoading(false);
-      }, 1000);
-
-      /*
-      // Actual API call (commented)
       const formData = new FormData();
-      fileList.forEach((file) => {
-        formData.append("category_image", file.originFileObj);
-      });
-      formData.append("data", JSON.stringify({ name: values.name }));
-      const res = await updateCategory({ formData, id: selectedCategory.key });
-      message.success(res.data.message);
+      if (fileList.length && fileList[0].originFileObj) {
+        formData.append("image", fileList[0].originFileObj);
+      }
+      formData.append("name", values.name);
+
+      const res = await updateCategory({ formData, id: selectedCategory?._id });
+      message.success(res?.data?.message || "Updated successfully");
       setEditModal(false);
-      setLoading(false);
-      */
     } catch (error) {
       console.error(error);
-      alert("Something went wrong (dummy)!");
+      message.error(error?.data?.message || "Update failed");
+    } finally {
       setLoading(false);
-      setEditModal(false);
     }
   };
 
@@ -100,6 +79,7 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
       onCancel={handleCancel}
       footer={null}
       width={600}
+      destroyOnClose // ✅ clears content when modal closes
     >
       <div className="mb-20 mt-4">
         <div className="font-bold text-center mb-11">Edit Category</div>
@@ -126,13 +106,12 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
               fileList={fileList}
               onChange={onChange}
               onPreview={onPreview}
-              multiple={true}
+              multiple={false}
             >
               {fileList.length < 1 && "+ Upload"}
             </Upload>
           </Form.Item>
 
-          {/* Save Button */}
           <Form.Item>
             <button
               type="submit"

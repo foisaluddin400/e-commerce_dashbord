@@ -1,20 +1,32 @@
-import { Form, Input, Modal, Select } from "antd";
+import { Form, Input, Modal, Select, Upload } from "antd";
 import React, { useState } from "react";
+import { useAddsubCategoryMutation, useGetCategoryQuery } from "../redux/api/categoryApi";
 // import { useAddSubCategoryMutation, useGetCategroyQuery } from "../redux/api/productManageApi";
-
-const AddSubCategories = ({ open, setOpen, categoryName }) => {
-  console.log(categoryName);
-
+const onPreview = async (file) => {
+  let src = file.url;
+  if (!src) {
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.originFileObj);
+      reader.onload = () => resolve(reader.result);
+    });
+  }
+  const image = new Image();
+  image.src = src;
+  const imgWindow = window.open(src);
+  imgWindow?.document.write(image.outerHTML);
+};
+const AddSubCategories = ({ openAddModal, setOpenAddModal }) => {
+  
+const [addCategory] = useAddsubCategoryMutation()
   // const [addSubCategory] = useAddSubCategoryMutation();
   // const { data: category } = useGetCategroyQuery();
   // const formCategory = category?.data?.result || [];
 
   // Dummy categories
-  const formCategory = categoryName || [
-    { _id: "1", name: "Fitness" },
-    { _id: "2", name: "Yoga" },
-    { _id: "3", name: "Cardio" },
-  ];
+  const{data:category} = useGetCategoryQuery()
+  console.log(category)
+  const formCategory = category?.data;
 
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -24,74 +36,45 @@ const AddSubCategories = ({ open, setOpen, categoryName }) => {
     setFileList(newFileList);
   };
 
-  const onPreview = async (file) => {
-    let src = file.url;
-    if (!src) {
-      src = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file.originFileObj);
-        reader.onload = () => resolve(reader.result);
-      });
-    }
-    const image = new Image();
-    image.src = src;
-    const imgWindow = window.open(src);
-    imgWindow?.document.write(image.outerHTML);
-  };
 
   const handleCancel = () => {
     form.resetFields();
     setFileList([]);
-    setOpen(false);
+    setOpenAddModal(false);
   };
 
   const handleSubmit = async (values) => {
     console.log("Submitted values:", values);
     setLoading(true);
     try {
-      // Dummy submit logic
-      const data = {
-        name: values.name,
-        category: values.category,
-        sub_category_image: fileList.map((file) => file.name),
-      };
-      console.log("Dummy data to submit:", data);
-
-      // Simulate API call delay
-      setTimeout(() => {
-        alert("Subcategory added successfully (dummy)!");
-        setOpen(false);
-        form.resetFields();
-        setFileList([]);
-        setLoading(false);
-      }, 1000);
-
-      /*
-      // Actual API call (commented)
       const formData = new FormData();
+
       fileList.forEach((file) => {
-        formData.append("sub_category_image", file.originFileObj);
+        formData.append("image", file.originFileObj);
       });
-      formData.append("data", JSON.stringify({ name: values.name, category: values.category }));
-      const res = await addSubCategory(formData);
+      formData.append("name", values.name);
+       formData.append("parentCategoryId", values.category);
+
+      const res = await addCategory(formData);
+      console.log(res);
       message.success(res.data.message);
-      setOpen(false);
-      form.resetFields();
-      setFileList([]);
       setLoading(false);
-      */
+      setOpenAddModal(false);
     } catch (error) {
       setLoading(false);
       console.error(error);
-      alert("Something went wrong (dummy)!");
-      // message.error(error?.data?.error);
+      message.error(message?.data?.error);
+      setOpenAddModal(false);
+    } finally {
+      setLoading(false);
+      setOpenAddModal(false);
     }
   };
 
   return (
     <Modal
       centered
-      open={open}
+      open={openAddModal}
       onCancel={handleCancel}
       footer={null}
       width={600}
@@ -109,9 +92,9 @@ const AddSubCategories = ({ open, setOpen, categoryName }) => {
             label="Category Name"
             rules={[{ required: true, message: "Please select a Category" }]}
           >
-            <Select placeholder="Select">
-              {formCategory.map((cat) => (
-                <Select.Option key={cat._id} value={cat._id}>
+          <Select placeholder="Select">
+              {formCategory?.map((cat) => (
+                <Select.Option key={cat?._id} value={cat?._id}>
                   {cat?.name}
                 </Select.Option>
               ))}
@@ -129,15 +112,17 @@ const AddSubCategories = ({ open, setOpen, categoryName }) => {
             />
           </Form.Item>
 
-          <Form.Item label="Photos">
-            <input
-              type="file"
-              multiple
-              onChange={(e) =>
-                setFileList(Array.from(e.target.files).map((f) => ({ name: f.name, originFileObj: f })))
-              }
-            />
-          </Form.Item>
+           <Form.Item label="Photos">
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onChange={onChange}
+                onPreview={onPreview}
+                multiple={true}
+              >
+                {fileList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
 
           <Form.Item>
             <button

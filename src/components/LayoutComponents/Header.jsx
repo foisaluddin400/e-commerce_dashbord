@@ -126,17 +126,17 @@ const Header = () => {
     navigate("/login");
   };
   return (
-    <div className=" text-black pt-5">
+    <div className=" text-black pt-4 border-b">
       <div className="flex justify-between">
         <div className="lg:hidden ">
-          <div className="py-3 pl-4">
+          <div className=" pl-4">
             <div onClick={showDrawer} className="text-3xl ">
               <FaBars />
             </div>
           </div>
         </div>
         <div></div>
-        <div className="flex gap-8 p-1 px-6">
+        <div className="flex gap-8  px-6">
           <div className="relative">
             <Link to={"/dashboard/Settings/notification"}>
               <div className="w-[45px] h-[45px] flex items-center justify-center text-xl rounded-full bg-white text-black ">

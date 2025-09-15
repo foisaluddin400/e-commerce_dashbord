@@ -1,20 +1,20 @@
-import { Form, Input, Modal, Select, Spin, Upload } from "antd";
+import { Form, Input, message, Modal, Select, Spin, Upload } from "antd";
 import React, { useEffect, useState } from "react";
+import { useUpdatesubCategoryMutation } from "../redux/api/categoryApi";
 // import { useUpdateSubCategoryMutation } from "../redux/api/productManageApi";
 
 const EditSubCategories = ({
   editModal,
   setEditModal,
   selectedCategory,
-  category,
 }) => {
-  console.log("Selected Subcategory:", selectedCategory);
+  console.log("Selected Subcategory:", selectedCategory?.categoryId?._id);
 
   // const [updateSub] = useUpdateSubCategoryMutation();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-
+const [editSub] = useUpdatesubCategoryMutation()
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
@@ -61,39 +61,26 @@ const EditSubCategories = ({
     console.log("Form values:", values);
     setLoading(true);
 
-    try {
-      // Dummy update logic
-      const dummyData = {
-        id: selectedCategory?.key || 1,
-        name: values.name,
-        category: selectedCategory?.category || "Dummy Category",
-        subImage: fileList.map((file) => file.url || file.name),
-      };
-      console.log("Dummy update data:", dummyData);
-
-      setTimeout(() => {
-        alert("Subcategory updated successfully (dummy)!");
-        setEditModal(false);
-        form.resetFields();
-        setFileList([]);
-        setLoading(false);
-      }, 1000);
-
-      /*
-      // Actual API call (commented)
+   try {
       const formData = new FormData();
+
       fileList.forEach((file) => {
-        formData.append("sub_category_image", file.originFileObj);
+        formData.append("image", file.originFileObj);
       });
-      formData.append("data", JSON.stringify({ name: values.name }));
-      const res = await updateSub({ formData, id: selectedCategory.key });
+      formData.append("name", values.name);
+       formData.append("parentCategoryId", selectedCategory?.categoryId?._id );
+
+      const res = await editSub({ formData, id: selectedCategory?.key });
+      console.log(res);
       message.success(res.data.message);
-      setEditModal(false);
       setLoading(false);
-      */
+      setEditModal(false);
     } catch (error) {
+      setLoading(false);
       console.error(error);
-      alert("Something went wrong (dummy)!");
+      message.error(message?.data?.error);
+      setEditModal(false);
+    } finally {
       setLoading(false);
       setEditModal(false);
     }
@@ -117,9 +104,9 @@ const EditSubCategories = ({
         >
           <Form.Item
             name="category"
-            label="Category"
+            label="Select Your Preferred Volunteer Role"
           >
-            <Select disabled placeholder={selectedCategory?.category || "Select Category"}></Select>
+            <Select disabled placeholder={selectedCategory?.categoryName}></Select>
           </Form.Item>
 
           <Form.Item

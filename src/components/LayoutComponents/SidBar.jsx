@@ -16,9 +16,10 @@ import { FaBorderNone } from "react-icons/fa6";
 import { FaBorderAll } from "react-icons/fa";
 import { MdContactSupport } from "react-icons/md";
 import { TbCategory2 } from "react-icons/tb";
-
+import { VscSymbolColor } from "react-icons/vsc";
 import { IoSettingsOutline } from "react-icons/io5";
-
+import { MdFormatSize } from "react-icons/md";
+import { TbTiltShift } from "react-icons/tb";
 const items = [
   {
     key: "dashboard",
@@ -33,8 +34,6 @@ const items = [
     link: "/dashboard/UserManagement",
   },
 
-  
-  
   {
     key: "categoriesManagement",
     label: "Categories Management",
@@ -53,7 +52,7 @@ const items = [
       },
     ],
   },
-    {
+  {
     key: "order",
     label: "Order",
     icon: <FaBorderNone />,
@@ -65,13 +64,32 @@ const items = [
     icon: <FaBorderAll />,
     link: "/dashboard/banner",
   },
+     {
+    key: "size",
+    label: "Size",
+    icon: <MdFormatSize />,
+    link: "/dashboard/size",
+  },
+  {
+    key: "color",
+    label: "Color",
+    icon: <VscSymbolColor />,
+    link: "/dashboard/color",
+  },
+  {
+    key: "product",
+    label: "Product",
+    icon: <TbTiltShift />,
+    link: "/dashboard/product",
+  },
+
   {
     key: "support",
     label: "Support",
     icon: <MdContactSupport />,
     link: "/dashboard/support",
   },
- 
+
   {
     key: "settings",
     label: "Settings",
@@ -159,9 +177,10 @@ const SidBar = () => {
 
   return (
     <div className="custom-sidebar h-[100vh] ">
-      
       <div className="custom-sidebar-logo flex justify-center">
-      <h1 className="text-4xl font-bold text-red-600 py-6">Shs<span>o</span>pflo</h1>
+        <h1 className="text-4xl font-bold text-red-600 py-4">
+          Shs<span>o</span>pflo
+        </h1>
       </div>
       <div className="menu-items">
         {items.map((item) => {
@@ -181,22 +200,25 @@ const SidBar = () => {
             <div key={item.key}>
               <Link
                 to={item.link}
-                className={`menu-item my-4 mx-5 py-3 px-3 flex items-center cursor-pointer ${
-                  selectedKey === item.key || isSettingsActive || isCreatorActive || isCategoriesActive
-                    ? "bg-[#E63946] text-white rounded-md"
-                    : "bg-white rounded-md hover:bg-gray-200"
+                className={`menu-item my-2 mx-2 py-[10px] px-3 flex items-center cursor-pointer ${
+                  selectedKey === item.key ||
+                  isSettingsActive ||
+                  isCreatorActive ||
+                  isCategoriesActive
+                    ? "bg-[#E63946] text-white rounded"
+                    : "bg-white rounded hover:bg-gray-200"
                 }`}
                 onClick={(e) => {
                   if (item.children) {
-                    e.preventDefault(); 
-                    onParentClick(item.key); 
+                    e.preventDefault();
+                    onParentClick(item.key);
                   } else {
                     setSelectedKey(item.key);
                   }
                 }}
               >
-                <h1  className="w-5 mr-2">{item.icon}</h1>
-                
+                <h1 className="w-5 mr-2">{item.icon}</h1>
+
                 <span className="block w-full ">{item.label}</span>
 
                 {/* Show dropdown arrow if children exist */}
@@ -212,7 +234,7 @@ const SidBar = () => {
               {/* Show children menu if expanded */}
               {item.children && (
                 <div
-                  className={`children-menu bg-white -my-2 mx-5 transition-all duration-300 ${
+                  className={`children-menu bg-white ml-6 mx-2  transition-all duration-300 ${
                     expandedKeys.includes(item.key) ? "expanded" : ""
                   }`}
                   style={{
@@ -226,7 +248,7 @@ const SidBar = () => {
                     <Link
                       key={child.key}
                       to={child.link}
-                      className={`menu-item p-4 flex items-center cursor-pointer ${
+                      className={`menu-item p-2 flex items-center cursor-pointer ${
                         selectedKey === child.key
                           ? "bg-[#E63946] text-white"
                           : "hover:bg-gray-200"
@@ -247,10 +269,10 @@ const SidBar = () => {
       </div>
 
       {/* Logout Button */}
-      <div className="  w-full p-4 px-5">
+      <div className="  w-full p-4 border-t mt-4">
         <button
           onClick={handleLogout}
-          className="w-full flex  text-black text-start rounded-md  p-3"
+          className="w-full flex  text-black text-start rounded-md  "
         >
           <span className="text-2xl">
             <IoIosLogIn />

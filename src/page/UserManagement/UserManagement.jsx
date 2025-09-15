@@ -6,6 +6,7 @@ import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
 import { GoLocation } from "react-icons/go";
 import { SearchOutlined } from "@ant-design/icons";
 import { LuEye } from "react-icons/lu";
+import { Navigate } from "../../Navigate";
 
 const UserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -93,21 +94,13 @@ const UserManagement = () => {
   const paginatedUsers = dummyUsers.slice(start, end);
 
   return (
-    <div className="">
-      <div className="flex justify-between mb-7 mt-4">
-        <h1 className="flex gap-4">
-          <button
-            className="text-[#EF4849] -mt-[20px]"
-            onClick={() => window.history.back()}
-          >
-            <FaArrowLeft />
-          </button>
-          <span className="text-lg font-semibold">User Management</span>
-        </h1>
+    <div className="bg-white p-3 ">
+      <div className="flex justify-between ">
+        <Navigate title={"User Management"} />
         <Input
           placeholder="Search by name..."
           prefix={<SearchOutlined />}
-          style={{ marginBottom: "16px", maxWidth: "300px" }}
+          style={{ marginBottom: "16px", maxWidth: "300px", height: "40px" }}
         />
       </div>
 
@@ -115,7 +108,9 @@ const UserManagement = () => {
         dataSource={paginatedUsers}
         columns={columns}
         pagination={false}
-        scroll={{ x: "max-content" }}
+        scroll={{ x: "max-content"}}
+        className="custom-table "
+        
       />
 
       <div className="mt-4 flex justify-center">

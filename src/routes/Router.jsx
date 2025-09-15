@@ -22,6 +22,11 @@ import Login from "../Auth/Login";
 import Order from "../page/order/Order";
 import Banner from "../page/bannar/Banner";
 import SupportTab from "../page/support/SupportTab";
+import AddProduct from "../page/product/AddProduct";
+import Color from "../page/product/Color";
+import ProductAddPage from "../page/product/ProductAddPage";
+import EditPRoduct from "../page/product/EditPRoduct";
+import SizePage from "../page/product/SizePage";
 
 
 export const router = createBrowserRouter([
@@ -68,6 +73,26 @@ export const router = createBrowserRouter([
        {
         path: "/dashboard/banner",
         element: <Banner></Banner>
+      },
+      {
+        path: "/dashboard/product",
+        element: <AddProduct></AddProduct>
+      },
+      {
+        path: "/dashboard/add-product",
+        element: <ProductAddPage></ProductAddPage>
+      },
+        {
+        path: "/dashboard/edit-product",
+        element: <EditPRoduct></EditPRoduct>
+      },
+      {
+        path: "/dashboard/color",
+        element:<Color></Color>
+      },
+      {
+        path: "/dashboard/size",
+        element:<SizePage></SizePage>
       },
       {
         path: "/dashboard/support",

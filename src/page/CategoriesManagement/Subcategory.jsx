@@ -1,82 +1,56 @@
-import { Table, Select, Button } from "antd";
+import { Table, Input, Select, message } from "antd";
 import { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "../../Navigate";
+import { SearchOutlined } from "@ant-design/icons";
 import AddSubCategories from "./AddSubCategories";
 import EditSubCategories from "./EditSubCategories";
-// import { useDeleteSubCategoryMutation, useGetSubCategoryQuery } from "../redux/api/productManageApi";
+import { useDeletesubCategoriesMutation, useGetCategoryQuery, useGetsubCategoryQuery } from "../redux/api/categoryApi";
+import { imageUrl } from "../redux/api/baseApi";
 
 const Subcategory = () => {
-  // const [deletSubCategory] = useDeleteSubCategoryMutation();
-  // const { data: subCategory, isLoading, isError } = useGetSubCategoryQuery();
-  const [open, setOpen] = useState(false);
+  const { data: subCategoryData, isLoading } = useGetsubCategoryQuery();
+  const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState("");
-  const navigate = useNavigate();
-
-  // Dummy data for categories
-  const selectCategoryOptions = [
-    { _id: "1", title: "Fitness" },
-    { _id: "2", title: "Yoga" },
-    { _id: "3", title: "Cardio" },
-  ];
-
-  // Dummy data for subcategories
-  const dummySubCategories = [
-    { _id: "101", name: "Cardio Basics", category: { _id: "3", name: "Cardio" }, image: "https://via.placeholder.com/70" },
-    { _id: "102", name: "Advanced Yoga", category: { _id: "2", name: "Yoga" }, image: "https://via.placeholder.com/70" },
-    { _id: "103", name: "Fitness 101", category: { _id: "1", name: "Fitness" }, image: "https://via.placeholder.com/70" },
-  ];
-
-  // Filter subcategories based on selected category
-  const filteredSubCategories = dummySubCategories.filter((item) =>
-    selectedCategoryId ? item.category._id === selectedCategoryId : true
-  );
-
-  // Table data
-  const dataSource = filteredSubCategories.map((item, index) => ({
-    key: item._id,
-    sl: index + 1,
-    image: item.category.image || "https://via.placeholder.com/70",
-    name: item.name,
-    category: item.category.name,
-    subImage: item.image,
-    rawCategory: item.category,
-    rawSub: item,
-  }));
-
-  const handleSelectChange = (value) => {
-    setSelectedCategoryId(value);
-  };
+  const [deleteSubCategory] = useDeletesubCategoriesMutation()
+  const{data:category} = useGetCategoryQuery()
+  console.log(category)
+  const formCategory = category?.data;
+  if (isLoading) return <p>Loading...</p>;
 
   const handleEdit = (record) => {
     setSelectedCategory(record);
     setEditModal(true);
   };
 
-  const handleDelete = (subId) => {
-    alert(`Deleted subcategory with ID: ${subId}`);
+  const handleDelete =async (id) => {
+   
+       try {
+      const res = await deleteSubCategory(id).unwrap();
+      message.success(res?.message);
+    } catch (err) {
+      message.error(err?.data?.message);
+    }
   };
 
+  const dataSource = subCategoryData?.data?.map((item, index) => ({
+    key: item?._id,
+    sl: index + 1,
+    name: item?.name,
+    categoryId: item?.parentCategoryId,
+    categoryName: item?.parentCategoryId?.name,
+    subImage: item?.imageUrl
+      ? `${imageUrl}${item?.imageUrl}`
+      : "https://via.placeholder.com/70",
+    rawSub: item,
+  }));
+
   const columns = [
-    {
-      title: "SL no.",
-      dataIndex: "sl",
-      key: "sl",
-    },
-    {
-      title: "Subcategory",
-      dataIndex: "name",
-      key: "name",
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-    },
+    { title: "SL no.", dataIndex: "sl", key: "sl" },
+    { title: "categoryName", dataIndex: "categoryName", key: "categoryName" },
+    { title: "Subcategory", dataIndex: "name", key: "name" },
     {
       title: "Sub Image",
       dataIndex: "subImage",
@@ -89,14 +63,14 @@ const Subcategory = () => {
       render: (_, record) => (
         <div className="flex gap-2 justify-end">
           <button
-            className="w-[36px] h-[36px] text-lg bg-[#007BFF] flex justify-center items-center text-white rounded"
+            className="w-[36px] h-[36px] bg-[#007BFF] text-white rounded flex justify-center items-center"
             onClick={() => handleEdit(record)}
           >
             <MdOutlineModeEdit />
           </button>
           <button
-            className="w-[36px] h-[36px] text-lg bg-[#E63946] flex justify-center items-center text-white rounded"
-            onClick={() => handleDelete(record.rawSub._id)}
+            className="w-[36px] h-[36px] bg-[#E63946] text-white rounded flex justify-center items-center"
+            onClick={() => handleDelete(record.key)}
           >
             <RiDeleteBin6Line />
           </button>
@@ -106,42 +80,49 @@ const Subcategory = () => {
   ];
 
   return (
-    <div className="mb-7 mt-4">
-      <h1 className="flex gap-4 items-center">
-        <button className="text-[#EF4849]" onClick={() => navigate(-1)}>
-          <FaArrowLeft />
-        </button>
-        <span className="text-lg font-semibold">Subcategory</span>
-      </h1>
+    <div className="bg-white p-3 h-[87vh]">
+      <div className="flex justify-between mb-4">
+        <Navigate title={"Sub Category"} />
+        <div className="flex gap-5">
+          <Select
+            style={{ height: "40px" }}
+            placeholder="Select Category"
+            // onChange={() => setShowStatus(true)}
+          >
+               {formCategory?.map((cat) => (
+                <Select.Option key={cat?._id} value={cat?._id}>
+                  {cat?.name}
+                </Select.Option>
+              ))}
+          </Select>
 
-      <div className="flex justify-between mt-9">
-        <Select
-          className="min-w-[200px]"
-          value={selectedCategoryId || undefined}
-          onChange={handleSelectChange}
-          placeholder="Select a category"
-        >
-          {selectCategoryOptions.map((cat) => (
-            <Select.Option key={cat._id} value={cat._id}>
-              {cat.title}
-            </Select.Option>
-          ))}
-        </Select>
-        <Button onClick={() => setOpen(true)} className="bg-[#E63946] text-white rounded-full">
-          + Add
-        </Button>
+          <Input
+            placeholder="Search by name..."
+            prefix={<SearchOutlined />}
+            style={{ maxWidth: "500px", height: "40px" }}
+          />
+
+          <div>
+            <button
+              onClick={() => setOpenAddModal(true)}
+              className="bg-[#E63946] w-[150px] text-white py-2 rounded"
+            >
+              Add Sub Category
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="mt-6">
-        <Table columns={columns} dataSource={dataSource} pagination={false} />
-      </div>
+      <Table columns={columns} dataSource={dataSource} pagination={false} />
 
-      <AddSubCategories open={open} setOpen={setOpen} categoryName={selectCategoryOptions} />
+      <AddSubCategories
+        openAddModal={openAddModal}
+        setOpenAddModal={setOpenAddModal}
+      />
       <EditSubCategories
         editModal={editModal}
         setEditModal={setEditModal}
         selectedCategory={selectedCategory}
-        category={selectCategoryOptions}
       />
     </div>
   );

@@ -1,19 +1,28 @@
-import { Form, Input, Modal, Spin } from "antd";
+import { Form, Input, message, Modal, Spin, Upload } from "antd";
 import React, { useState } from "react";
+import { useAddCategoryMutation } from "../redux/api/categoryApi";
 // import { useAddCategoryMutation } from "../redux/api/productManageApi";
-
+const onPreview = async (file) => {
+  let src = file.url;
+  if (!src) {
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.originFileObj);
+      reader.onload = () => resolve(reader.result);
+    });
+  }
+  const image = new Image();
+  image.src = src;
+  const imgWindow = window.open(src);
+  imgWindow?.document.write(image.outerHTML);
+};
 const AddCategories = ({ openAddModal, setOpenAddModal }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
-  // const [addcategory] = useAddCategoryMutation();
+  const [addcategory] = useAddCategoryMutation();
   const [loading, setLoading] = useState(false);
-
-  const onChange = (e) => {
-    const files = Array.from(e.target.files).map((f) => ({
-      name: f.name,
-      originFileObj: f,
-    }));
-    setFileList(files);
+  const onChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
   };
 
   const handleCancel = () => {
@@ -27,38 +36,24 @@ const AddCategories = ({ openAddModal, setOpenAddModal }) => {
     setLoading(true);
 
     try {
-      // Dummy submit logic
-      const data = {
-        name: values.name,
-        category_image: fileList.map((file) => file.name),
-      };
-      console.log("Dummy data to submit:", data);
-
-      setTimeout(() => {
-        alert("Category added successfully (dummy)!");
-        setOpenAddModal(false);
-        form.resetFields();
-        setFileList([]);
-        setLoading(false);
-      }, 1000);
-
-      /*
-      // Actual API call (commented)
       const formData = new FormData();
+
       fileList.forEach((file) => {
-        formData.append("category_image", file.originFileObj);
+        formData.append("image", file.originFileObj);
       });
-      formData.append("data", JSON.stringify({ name: values.name }));
+      formData.append("name", values.name);
+
       const res = await addcategory(formData);
+      console.log(res);
       message.success(res.data.message);
-      setOpenAddModal(false);
-      form.resetFields();
-      setFileList([]);
       setLoading(false);
-      */
+      setOpenAddModal(false);
     } catch (error) {
+      setLoading(false);
       console.error(error);
-      alert("Something went wrong (dummy)!");
+      message.error(message?.data?.error);
+      setOpenAddModal(false);
+    } finally {
       setLoading(false);
       setOpenAddModal(false);
     }
@@ -94,7 +89,15 @@ const AddCategories = ({ openAddModal, setOpenAddModal }) => {
             </Form.Item>
 
             <Form.Item label="Photos">
-              <input type="file" multiple onChange={onChange} />
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onChange={onChange}
+                onPreview={onPreview}
+                multiple={true}
+              >
+                {fileList.length < 1 && "+ Upload"}
+              </Upload>
             </Form.Item>
 
             {/* Save Button */}

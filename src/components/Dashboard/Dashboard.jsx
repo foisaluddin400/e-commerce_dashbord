@@ -8,8 +8,8 @@ import logo4 from '../../assets/header/hh.png'
 import logo5 from '../../assets/header/pp.png'
 const Dashboard = () => {
   return (
-    <div className="p-1 min-h-screen">
-      <div className=" grid md:grid-cols-4 grid-cols-2 gap-4 text-center py-3">
+    <div className=" min-h-screen">
+      <div className=" grid md:grid-cols-4 grid-cols-2 gap-4 text-center pb-3">
         <div className="bg-white py-6 rounded-md">
           <p className=" mt-3 text-xl">Total User</p>
           <div className="flex justify-center my-2">
