@@ -13,7 +13,7 @@ const baseQuery = fetchBaseQuery({
     const token = getState().logInUser.token;
     console.log("from baseApi", token);
     if (token) {
-      headers.set("authorization", `${token}`);
+      headers.set("authorization", `Bearer ${token}`);
     }
     return headers;
   },

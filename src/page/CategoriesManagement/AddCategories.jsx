@@ -84,7 +84,7 @@ const AddCategories = ({ openAddModal, setOpenAddModal }) => {
             >
               <Input
                 placeholder="Enter title"
-                style={{ borderRadius: "0px", padding: "6px 8px" }}
+                style={{ height:"40px" }}
               />
             </Form.Item>
 

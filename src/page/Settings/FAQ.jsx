@@ -11,6 +11,7 @@ import {
   useGetFaqQuery,
   useUpdateFaqMutation,
 } from "../redux/api/metaApi";
+import { Navigate } from "../../Navigate";
 
 const FAQ = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(null);
@@ -76,8 +77,9 @@ const FAQ = () => {
   };
 
   return (
-    <div className="relative p-5 z-0">
+    <div className="relative bg-white p-3 h-[87vh]">
       <div className="flex justify-between items-center">
+         <Navigate title={"Faq"} />
         <button
           onClick={() => setAddModalOpen(true)}
           className="bg-[#E63946] text-white font-semibold px-5 py-2 rounded transition duration-200"
@@ -86,7 +88,7 @@ const FAQ = () => {
         </button>
       </div>
 
-      <div className="flex gap-2 flex-col w-full mt-5 bg-white p-5">
+      <div className="flex gap-2 flex-col w-full mt-5  p-5">
         {faqResponse?.data?.map((faq, index) => (
           <section key={faq._id} className="border-b border-[#e5eaf2] rounded py-3">
             <div

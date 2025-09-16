@@ -24,7 +24,9 @@ const [addCategory] = useAddsubCategoryMutation()
   // const formCategory = category?.data?.result || [];
 
   // Dummy categories
-  const{data:category} = useGetCategoryQuery()
+  const limit = 3
+  const page = 1
+  const{data:category} = useGetCategoryQuery({limit, page:page})
   console.log(category)
   const formCategory = category?.data;
 
@@ -92,7 +94,7 @@ const [addCategory] = useAddsubCategoryMutation()
             label="Category Name"
             rules={[{ required: true, message: "Please select a Category" }]}
           >
-          <Select placeholder="Select">
+          <Select  style={{ height:"40px" }} placeholder="Select">
               {formCategory?.map((cat) => (
                 <Select.Option key={cat?._id} value={cat?._id}>
                   {cat?.name}
@@ -108,7 +110,7 @@ const [addCategory] = useAddsubCategoryMutation()
           >
             <Input
               placeholder="Enter Subcategory Name"
-              style={{ borderRadius: "0px", padding: "6px 8px" }}
+              style={{ height:"40px" }}
             />
           </Form.Item>
 

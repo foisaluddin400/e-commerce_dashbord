@@ -7,7 +7,7 @@ import user from "../../assets/routerImg/user.png";
 import logo from "../../assets/header/logo.png";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { FaChevronRight, FaHome } from "react-icons/fa";
+import { FaChevronRight, FaHome, FaJediOrder } from "react-icons/fa";
 import { IoIosLogIn } from "react-icons/io";
 import { logout } from "../../page/redux/features/auth/authSlice";
 import { useDispatch } from "react-redux";
@@ -15,7 +15,7 @@ import { FiUser } from "react-icons/fi";
 import { FaBorderNone } from "react-icons/fa6";
 import { FaBorderAll } from "react-icons/fa";
 import { MdContactSupport } from "react-icons/md";
-import { TbCategory2 } from "react-icons/tb";
+import { TbCategory2, TbLogs } from "react-icons/tb";
 import { VscSymbolColor } from "react-icons/vsc";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdFormatSize } from "react-icons/md";
@@ -55,7 +55,7 @@ const items = [
   {
     key: "order",
     label: "Order",
-    icon: <FaBorderNone />,
+    icon: <FaJediOrder />,
     link: "/dashboard/order",
   },
   {
@@ -82,7 +82,12 @@ const items = [
     icon: <TbTiltShift />,
     link: "/dashboard/product",
   },
-
+ {
+    key: "blog",
+    label: "blog",
+    icon: <TbLogs />,
+    link: "/dashboard/blogs",
+  },
   {
     key: "support",
     label: "Support",

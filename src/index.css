@@ -91,18 +91,18 @@ select option {
 
 /* Pagination buttons style */
 .ant-pagination-item {
-  border-radius: 50% !important; /* Make buttons circular */
+  border-radius: 10% !important; /* Make buttons circular */
 }
 
 /* Active pagination button */
 .ant-pagination-item-active {
-  background-color: #D9000A !important; /* Active background color */
-  border-color: #D9000A !important;    /* Active border color */
+  background-color: #ffffff !important; /* Active background color */
+  border-color: #0094d9 !important;    /* Active border color */
 }
 
 /* Active pagination button text */
 .ant-pagination-item-active > a {
-  color: white !important; /* Ensure active text color is white */
+  color: rgb(0, 0, 0) !important; /* Ensure active text color is white */
 }
 
 /* Hover effect for buttons */

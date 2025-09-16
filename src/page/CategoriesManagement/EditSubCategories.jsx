@@ -106,7 +106,7 @@ const [editSub] = useUpdatesubCategoryMutation()
             name="category"
             label="Select Your Preferred Volunteer Role"
           >
-            <Select disabled placeholder={selectedCategory?.categoryName}></Select>
+            <Select  style={{ height:"40px" }} disabled placeholder={selectedCategory?.categoryName}></Select>
           </Form.Item>
 
           <Form.Item
@@ -116,7 +116,7 @@ const [editSub] = useUpdatesubCategoryMutation()
           >
             <Input
               placeholder="Enter Title"
-              style={{ borderRadius: "0px", padding: "6px 8px" }}
+               style={{ height:"40px" }}
             />
           </Form.Item>
 

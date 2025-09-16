@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Table, Button, Space, message, Input } from "antd";
+import { Table, Button, Space, message, Input, Pagination } from "antd";
 import { EditOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { Navigate } from "../../Navigate";
 import AddColor from "./AddColor";
@@ -7,7 +7,12 @@ import { useDeleteColorMutation, useGetColorQuery } from "../redux/api/categoryA
 import EditColor from "./EditColor";
 
 const Color = () => {
-  const { data: colorsData } = useGetColorQuery();
+    const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const { data: colorsData } = useGetColorQuery({    search,
+    page: currentPage,
+    limit: pageSize,});
   const [openAddModal, setOpenAddModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
    const [editModal, setEditModal] = useState(false);
@@ -32,7 +37,7 @@ const Color = () => {
       message.error(err?.data?.message);
     }
   };
-
+  const handlePageChange = (page) => setCurrentPage(page);
   const columns = [
     {
       title: "S.N",
@@ -92,6 +97,7 @@ const Color = () => {
         <Navigate title={"Color"} />
         <div className="flex gap-5">
           <Input
+           onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
@@ -114,6 +120,16 @@ const Color = () => {
         className="custom-table"
         scroll={{ x: "max-content" }}
       />
+
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={colorsData?.meta?.total || 0}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
+      </div>
 
       <AddColor
         setOpenAddModal={setOpenAddModal}

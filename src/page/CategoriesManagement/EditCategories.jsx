@@ -94,10 +94,7 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
             name="name"
             rules={[{ required: true, message: "Please input title" }]}
           >
-            <Input
-              placeholder="Enter title"
-              style={{ borderRadius: "0px", padding: "6px 8px" }}
-            />
+            <Input placeholder="Enter title" style={{ height: "40px" }} />
           </Form.Item>
 
           <Form.Item label="Photos">

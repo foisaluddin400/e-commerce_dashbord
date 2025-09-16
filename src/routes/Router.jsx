@@ -27,6 +27,9 @@ import Color from "../page/product/Color";
 import ProductAddPage from "../page/product/ProductAddPage";
 import EditPRoduct from "../page/product/EditPRoduct";
 import SizePage from "../page/product/SizePage";
+import Blog from "../page/blog/Blog";
+import BlogDetails from "../page/blog/BlogDetails";
+import ProtectedRoute from "../protectedRoute/ProtectedRoute";
 
 
 export const router = createBrowserRouter([
@@ -34,7 +37,7 @@ export const router = createBrowserRouter([
     path: "/",
     element: (
      
-        <DashboardLayout></DashboardLayout>
+        <ProtectedRoute><DashboardLayout></DashboardLayout></ProtectedRoute>
       
     ),
     children: [
@@ -93,6 +96,14 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/size",
         element:<SizePage></SizePage>
+      },
+        {
+        path: "/dashboard/blogs",
+        element:<Blog></Blog>
+      },
+           {
+        path: "/dashboard/blog-details/:id",
+        element:<BlogDetails></BlogDetails>
       },
       {
         path: "/dashboard/support",

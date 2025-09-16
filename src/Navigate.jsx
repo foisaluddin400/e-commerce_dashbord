@@ -4,7 +4,7 @@ import { FaArrowLeft } from "react-icons/fa";
 export const Navigate = ({title}) => {
     const navigate = useNavigate()
   return (
-    <div>
+    <div className=''>
         <div
           style={{
             display: "flex",

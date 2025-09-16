@@ -94,7 +94,7 @@ const UserManagement = () => {
   const paginatedUsers = dummyUsers.slice(start, end);
 
   return (
-    <div className="bg-white p-3 ">
+    <div className="bg-white p-3 h-[87vh] overflow-auto ">
       <div className="flex justify-between ">
         <Navigate title={"User Management"} />
         <Input

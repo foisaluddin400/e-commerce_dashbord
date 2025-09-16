@@ -43,6 +43,47 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+    getContact: builder.query({
+      query: () => {
+        return {
+          url: `/contact/business-info`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+       getClientContact: builder.query({
+      query: ({page, limit}) => {
+        return {
+          url: `/contact/messages?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    updateContact: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/contact/business-info`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+      deleteContactClients: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/contact/messages/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
     //     getUserAll: builder.query({
     //       query: ({ page, limit }) => {
     //         return {
@@ -188,4 +229,13 @@ const meta = baseApi.injectEndpoints({
   }),
 });
 
-export const {useAddFaqMutation,useDeleteFaqMutation,useGetFaqQuery,useUpdateFaqMutation} = meta;
+export const {
+  useAddFaqMutation,
+  useDeleteFaqMutation,
+  useGetFaqQuery,
+  useUpdateFaqMutation,
+  useUpdateContactMutation,
+  useGetContactQuery,
+  useGetClientContactQuery,
+  useDeleteContactClientsMutation
+} = meta;

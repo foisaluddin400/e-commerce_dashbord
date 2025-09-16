@@ -1,4 +1,4 @@
-import { Table, Input, Select, message } from "antd";
+import { Table, Input, Select, message, Pagination } from "antd";
 import { useState } from "react";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -6,17 +6,28 @@ import { Navigate } from "../../Navigate";
 import { SearchOutlined } from "@ant-design/icons";
 import AddSubCategories from "./AddSubCategories";
 import EditSubCategories from "./EditSubCategories";
-import { useDeletesubCategoriesMutation, useGetCategoryQuery, useGetsubCategoryQuery } from "../redux/api/categoryApi";
+import {
+  useDeletesubCategoriesMutation,
+  useGetCategoryQuery,
+  useGetsubCategoryQuery,
+} from "../redux/api/categoryApi";
 import { imageUrl } from "../redux/api/baseApi";
 
 const Subcategory = () => {
-  const { data: subCategoryData, isLoading } = useGetsubCategoryQuery();
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const { data: subCategoryData, isLoading } = useGetsubCategoryQuery({
+    search,
+    page: currentPage,
+    limit: pageSize,
+  });
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [deleteSubCategory] = useDeletesubCategoriesMutation()
-  const{data:category} = useGetCategoryQuery()
-  console.log(category)
+  const [deleteSubCategory] = useDeletesubCategoriesMutation();
+  const { data: category } = useGetCategoryQuery();
+  console.log(category);
   const formCategory = category?.data;
   if (isLoading) return <p>Loading...</p>;
 
@@ -24,10 +35,9 @@ const Subcategory = () => {
     setSelectedCategory(record);
     setEditModal(true);
   };
-
-  const handleDelete =async (id) => {
-   
-       try {
+  const handlePageChange = (page) => setCurrentPage(page);
+  const handleDelete = async (id) => {
+    try {
       const res = await deleteSubCategory(id).unwrap();
       message.success(res?.message);
     } catch (err) {
@@ -37,7 +47,7 @@ const Subcategory = () => {
 
   const dataSource = subCategoryData?.data?.map((item, index) => ({
     key: item?._id,
-    sl: index + 1,
+    sl: (currentPage - 1) * pageSize + (index + 1),
     name: item?.name,
     categoryId: item?.parentCategoryId,
     categoryName: item?.parentCategoryId?.name,
@@ -60,6 +70,7 @@ const Subcategory = () => {
     {
       title: "Action",
       key: "action",
+      align: "end",
       render: (_, record) => (
         <div className="flex gap-2 justify-end">
           <button
@@ -89,14 +100,15 @@ const Subcategory = () => {
             placeholder="Select Category"
             // onChange={() => setShowStatus(true)}
           >
-               {formCategory?.map((cat) => (
-                <Select.Option key={cat?._id} value={cat?._id}>
-                  {cat?.name}
-                </Select.Option>
-              ))}
+            {formCategory?.map((cat) => (
+              <Select.Option key={cat?._id} value={cat?._id}>
+                {cat?.name}
+              </Select.Option>
+            ))}
           </Select>
 
           <Input
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
@@ -114,7 +126,15 @@ const Subcategory = () => {
       </div>
 
       <Table columns={columns} dataSource={dataSource} pagination={false} />
-
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={subCategoryData?.meta?.total || 0}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
+      </div>
       <AddSubCategories
         openAddModal={openAddModal}
         setOpenAddModal={setOpenAddModal}

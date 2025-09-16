@@ -1,4 +1,4 @@
-import { Input, message, Table } from "antd";
+import { Input, message, Pagination, Table } from "antd";
 import { useState } from "react";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -7,19 +7,30 @@ import AddCategories from "./AddCategories";
 import EditCategories from "./EditCategories";
 import { Navigate } from "../../Navigate";
 import { SearchOutlined } from "@ant-design/icons";
-import { useDeleteCategoriesMutation, useGetCategoryQuery } from "../redux/api/categoryApi";
+import {
+  useDeleteCategoriesMutation,
+  useGetAllCategoryQuery,
+  useGetCategoryQuery,
+} from "../redux/api/categoryApi";
 import { imageUrl } from "../redux/api/baseApi";
 
 const Categories = () => {
   const [deleteCategory] = useDeleteCategoriesMutation();
-  const { data: categorys, isLoading } = useGetCategoryQuery();
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
+  const { data: categorys, isLoading } = useGetAllCategoryQuery({
+    search,
+    page: currentPage,
+    limit: pageSize,
+  });
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-
+  const handlePageChange = (page) => setCurrentPage(page);
   const navigate = useNavigate();
   const handleDeleteCategory = async (id) => {
-    console.log(id)
+    console.log(id);
     try {
       const res = await deleteCategory(id).unwrap();
       message.success(res?.message);
@@ -40,7 +51,7 @@ const Categories = () => {
       title: "SL No.",
       dataIndex: "sl",
       key: "sl",
-      render: (_, __, index) => index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + (index + 1),
     },
     {
       title: "Image",
@@ -90,16 +101,20 @@ const Categories = () => {
         <Navigate title={"Category"} />
         <div className="flex gap-5">
           <Input
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
           />
-        <div>  <button
-            onClick={() => setOpenAddModal(true)}
-            className="bg-[#E63946] w-[150px] text-white py-2 rounded"
-          >
-            Add Category
-          </button></div>
+          <div>
+            {" "}
+            <button
+              onClick={() => setOpenAddModal(true)}
+              className="bg-[#E63946] w-[150px] text-white py-2 rounded"
+            >
+              Add Category
+            </button>
+          </div>
         </div>
       </div>
 
@@ -112,6 +127,16 @@ const Categories = () => {
         scroll={{ x: "max-content" }}
         loading={isLoading}
       />
+
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={categorys?.meta?.total || 0}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
+      </div>
 
       <AddCategories
         openAddModal={openAddModal}
