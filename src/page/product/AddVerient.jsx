@@ -19,7 +19,7 @@ const onPreview = async (file) => {
   imgWindow?.document.write(image.outerHTML);
 };
 
-const EditPRoduct = () => {
+const AddVerient = () => {
 
   const [frontImageList, setFrontImageList] = useState([]);
   const [backImageList, setBackImageList] = useState([]);
@@ -43,7 +43,7 @@ const EditPRoduct = () => {
 
   return (
     <div className="bg-white p-3">
-      <Navigate title={"Edit Product Verient"} />
+      <Navigate title={"Add Product Verient"} />
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Main Product Info */}
 
@@ -162,4 +162,4 @@ const EditPRoduct = () => {
   );
 };
 
-export default EditPRoduct;
+export default AddVerient;

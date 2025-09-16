@@ -5,7 +5,7 @@ import JoditEditor from "jodit-react";
 
 const { Option } = Select;
 
-const ProductAddPage = () => {
+const EditProductInfo = () => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
   const [form] = Form.useForm();
@@ -42,7 +42,7 @@ const ProductAddPage = () => {
 
   return (
     <div className="bg-white p-3">
-      <Navigate title={"Add Product"} />
+      <Navigate title={"Edit Product"} />
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Main Product Info */}
         <div className="grid grid-cols-3 gap-4">
@@ -143,4 +143,4 @@ const ProductAddPage = () => {
   );
 };
 
-export default ProductAddPage;
+export default EditProductInfo;

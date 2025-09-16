@@ -33,6 +33,7 @@
     transform: translateY(-50%);
     transition: background-color 0.2s;
     content: "";
+   
 }
 
 .children-menu {
@@ -77,9 +78,7 @@ select option {
   background: #f5f5f5; /* Optional: Header Background */
 }
 
-.ant-table-tbody > tr > td {
-  border: none !important;
-}
+
 
 .ant-pagination {
   border: none !important;

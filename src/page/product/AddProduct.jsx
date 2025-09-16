@@ -243,15 +243,15 @@ const AddProduct = () => {
   return (
     <div className="bg-white p-3 h-[87vh] ">
       <div className="flex justify-between mb-4">
-        <Navigate title={"Products"} />
+        <Navigate title={"Products Verients"} />
         <div className="flex gap-5">
-           <div>
+          <div>
             <Select
               style={{ height: "40px" }}
               placeholder="Select Category"
               // onChange={() => setShowStatus(true)}
             >
-           <Option value="clothing">Clothing</Option>
+              <Option value="clothing">Clothing</Option>
               <Option value="electronics">Electronics</Option>
               <Option value="accessories">Accessories</Option>
             </Select>
@@ -262,14 +262,13 @@ const AddProduct = () => {
             style={{ maxWidth: "500px", height: "40px" }}
           />
           <div>
-            <Link to={"/dashboard/add-product"}>
+            <Link to={"/dashboard/add-verient"}>
               {" "}
               <button className="bg-[#E63946] w-[150px] text-white py-2 rounded">
-                Add Product
+                Add Verient
               </button>
             </Link>
           </div>
-         
         </div>
       </div>
 

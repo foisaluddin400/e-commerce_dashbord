@@ -21,11 +21,11 @@ const Login = () => {
         message.success(payload?.message);
         navigate("/");
       } else {
-        message.error(payload?.message || "Login failed!");
+        message.error(payload?.message );
       }
     } catch (error) {
       console.error("Login error:", error);
-      message.error(error?.data?.message || "Something went wrong. Try again!");
+      message.error(error?.data?.message || "Server is down");
     } finally {
     }
   };

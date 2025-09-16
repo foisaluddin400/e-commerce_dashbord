@@ -205,13 +205,13 @@ const SidBar = () => {
             <div key={item.key}>
               <Link
                 to={item.link}
-                className={`menu-item my-2 mx-2 py-[10px] px-3 flex items-center cursor-pointer ${
+                className={`menu-item my-2 mr-3 py-[10px] px-3 flex items-center cursor-pointer ${
                   selectedKey === item.key ||
                   isSettingsActive ||
                   isCreatorActive ||
                   isCategoriesActive
-                    ? "bg-[#E63946] text-white rounded"
-                    : "bg-white rounded hover:bg-gray-200"
+                    ? "bg-[#E63946] text-white rounded-r-3xl "
+                    : "bg-white rounded-r-3xl hover:bg-gray-200"
                 }`}
                 onClick={(e) => {
                   if (item.children) {
@@ -229,7 +229,7 @@ const SidBar = () => {
                 {/* Show dropdown arrow if children exist */}
                 {item.children && (
                   <FaChevronRight
-                    className={`ml-auto transform transition-all duration-300 ${
+                    className={`ml-auto transform transition-all text-[10px] duration-300 ${
                       expandedKeys.includes(item.key) ? "rotate-90" : ""
                     }`}
                   />

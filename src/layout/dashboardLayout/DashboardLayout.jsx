@@ -6,12 +6,12 @@ const DashboardLayout = () => {
   return (
     <div className="lg:flex ">
     
-      <div className="lg:w-72 bg-[#FEFEFE] overflow-auto lg:fixed lg:top-0 lg:left-0 lg:bottom-0 hidden lg:block no-scrollbar">
+      <div className="lg:w-[260px] bg-[#FEFEFE] overflow-auto lg:fixed lg:top-0 lg:left-0 lg:bottom-0 hidden lg:block no-scrollbar">
         <SidBar />
       </div>
 
      
-      <div className=" lg:flex-1 lg:ml-72">
+      <div className=" lg:flex-1 lg:ml-[270px]">
         <Header />
         <div className="p-3 bg-slate-50">
           <Outlet />

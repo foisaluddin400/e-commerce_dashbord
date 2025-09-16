@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Form, Input, Select, message, Card } from "antd";
-import { useGetContactQuery, useUpdateContactMutation } from "../redux/api/metaApi";
+import {
+  useGetContactQuery,
+  useUpdateContactMutation,
+} from "../redux/api/metaApi";
 import { City, Country, State } from "country-state-city";
 
 const Vendor = () => {
@@ -42,9 +45,15 @@ const Vendor = () => {
       const data = {
         phone: values.phone,
         email: values.email,
-        Country: countries.find(c => c.isoCode === values.country)?.name || values.country || "",
-        State: states.find(s => s.isoCode === values.state)?.name || values.state || "",
-        City: values.city || ""
+        Country:
+          countries.find((c) => c.isoCode === values.country)?.name ||
+          values.country ||
+          "",
+        State:
+          states.find((s) => s.isoCode === values.state)?.name ||
+          values.state ||
+          "",
+        City: values.city || "",
       };
       const res = await updateContact(data).unwrap();
       message.success(res?.message);
@@ -70,10 +79,16 @@ const Vendor = () => {
       {/* LEFT SIDE: Contact Info + Map */}
       <div>
         <Card title="Current Contact Info" className="text-lg">
-          <p><strong>Email:</strong> {contactData?.data?.email}</p>
-          <p className="py-2"><strong>Phone:</strong> {contactData?.data?.phone}</p>
-          <p><strong>Address:</strong> {contactData?.data?.Country}, {contactData?.data?.State}, {contactData?.data?.City}</p>
-         
+          <p>
+            <strong>Email:</strong> {contactData?.data?.email}
+          </p>
+          <p className="py-2">
+            <strong>Phone:</strong> {contactData?.data?.phone}
+          </p>
+          <p>
+            <strong>Address:</strong> {contactData?.data?.Country},{" "}
+            {contactData?.data?.State}, {contactData?.data?.City}
+          </p>
 
           <div className="mt-6">
             {contactData?.data?.Country && (
@@ -82,7 +97,9 @@ const Vendor = () => {
                 width="100%"
                 height="300"
                 className="rounded border"
-                src={`https://www.google.com/maps?q=${encodeURIComponent(getMapQuery())}&output=embed`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(
+                  getMapQuery()
+                )}&output=embed`}
                 allowFullScreen
                 loading="lazy"
               ></iframe>
@@ -106,7 +123,9 @@ const Vendor = () => {
             <Form.Item
               label="Phone"
               name="phone"
-              rules={[{ required: true, message: "Please enter your phone number!" }]}
+              rules={[
+                { required: true, message: "Please enter your phone number!" },
+              ]}
             >
               <Input placeholder="Enter your phone number" className="h-12" />
             </Form.Item>
@@ -116,7 +135,9 @@ const Vendor = () => {
             <Form.Item
               label="Select Your Country"
               name="country"
-              rules={[{ required: true, message: "Please select your country!" }]}
+              rules={[
+                { required: true, message: "Please select your country!" },
+              ]}
             >
               <Select
                 placeholder="Select your country"

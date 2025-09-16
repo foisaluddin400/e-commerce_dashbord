@@ -193,7 +193,7 @@ const Header = () => {
                         
                         {item.children && (
                           <FaChevronRight
-                            className={`ml-auto transform transition-all duration-300 ${
+                            className={`ml-auto transform text-[10px] transition-all duration-300 ${
                               expandedKeys.includes(item.key) ? "rotate-90" : ""
                             }`}
                           />

@@ -30,6 +30,9 @@ import SizePage from "../page/product/SizePage";
 import Blog from "../page/blog/Blog";
 import BlogDetails from "../page/blog/BlogDetails";
 import ProtectedRoute from "../protectedRoute/ProtectedRoute";
+import MainProduct from "../page/product/MainProduct";
+import AddVerient from "../page/product/AddVerient";
+import EditProductInfo from "../page/product/EditProductInfo";
 
 
 export const router = createBrowserRouter([
@@ -77,13 +80,25 @@ export const router = createBrowserRouter([
         path: "/dashboard/banner",
         element: <Banner></Banner>
       },
-      {
+       {
         path: "/dashboard/product",
+        element: <MainProduct></MainProduct>
+      },
+      {
+        path: "/dashboard/product-verient",
         element: <AddProduct></AddProduct>
       },
       {
         path: "/dashboard/add-product",
         element: <ProductAddPage></ProductAddPage>
+      },
+      {
+        path: "/dashboard/edit-productInfo",
+        element: <EditProductInfo></EditProductInfo>
+      },
+        {
+        path: "/dashboard/add-verient",
+        element: <AddVerient></AddVerient>
       },
         {
         path: "/dashboard/edit-product",
