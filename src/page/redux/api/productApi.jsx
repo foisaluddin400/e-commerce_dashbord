@@ -1,175 +1,20 @@
 import { baseApi } from "./baseApi";
 
-const category = baseApi.injectEndpoints({
+const product = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    getCategory: builder.query({
-      query: ({limit,page}) => {
-        return {
-          url: `/categories?limit=${limit}&page=${page}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-     getBrandsName: builder.query({
+    getProduct: builder.query({
       query: () => {
         return {
-          url: `/brands`,
+          url: `/products`,
           method: "GET",
         };
       },
       providesTags: ["updateProfile"],
     }),
-
-
- deleteBrands: builder.mutation({
-      query: (id) => {
-        return {
-          url: `/brands/${id}`,
-          method: "DELETE",
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    addBrands: builder.mutation({
+    addProduct: builder.mutation({
       query: (data) => {
         return {
-          url: "/brands",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-    updateBrands: builder.mutation({
-      query: ({ formData, id }) => {
-        return {
-          url: `/brands/${id}`,
-          method: "PATCH",
-          body: formData,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-     getAllCategory: builder.query({
-      query: ({ page, limit, search }) => {
-        return {
-          url: `/categories?search=${search}&page=${page}&limit=${limit}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-    deleteCategories: builder.mutation({
-      query: (id) => {
-        return {
-          url: `/categories/${id}`,
-          method: "DELETE",
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    addCategory: builder.mutation({
-      query: (data) => {
-        return {
-          url: "/categories",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-    updateCategory: builder.mutation({
-      query: ({ formData, id }) => {
-        return {
-          url: `/categories/${id}`,
-          method: "PATCH",
-          body: formData,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    getsubCategory: builder.query({
-      query: ({ page, limit, search }) => {
-        return {
-          url: `/subcategories?search=${search}&page=${page}&limit=${limit}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-    deletesubCategories: builder.mutation({
-      query: (id) => {
-        return {
-          url: `/subcategories/${id}`,
-          method: "DELETE",
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    addsubCategory: builder.mutation({
-      query: (data) => {
-        return {
-          url: "/subcategories",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-    updatesubCategory: builder.mutation({
-      query: ({ formData, id }) => {
-        return {
-          url: `/subcategories/${id}`,
-          method: "PATCH",
-          body: formData,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    getSize: builder.query({
-      query: ({page, limit, search}) => {
-        return {
-          url: `/sizes?search=${search}&page=${page}&limit=${limit}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-    getSizeCat: builder.query({
-      query: () => {
-        return {
-          url: `/sizes`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-    deleteSize: builder.mutation({
-      query: (id) => {
-        return {
-          url: `/sizes/${id}`,
-          method: "DELETE",
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    addSeize: builder.mutation({
-      query: (data) => {
-        return {
-          url: "/sizes",
+          url: "/products",
           method: "POST",
           body: data,
         };
@@ -177,62 +22,29 @@ const category = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-    updateSize: builder.mutation({
-      query: ({ formData, id }) => {
+    deleteProduct: builder.mutation({
+      query: (id) => {
         return {
-          url: `/sizes/${id}`,
-          method: "PATCH",
-          body: formData,
+          url: `/products/${id}`,
+          method: "DELETE",
         };
       },
       invalidatesTags: ["updateProfile"],
     }),
-
-    getColor: builder.query({
-      query: ({page, limit, search}) => {
+    deleteVariantProduct: builder.mutation({
+      query: ({ variantId, productId }) => {
         return {
-          url: `/colors?search=${search}&page=${page}&limit=${limit}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-      getColorCat: builder.query({
-      query: () => {
-        return {
-          url: `/colors`,
-          method: "GET",
-        };
-      },
-      providesTags: ["updateProfile"],
-    }),
-
-    deleteColor: builder.mutation({
-      query: (id) => {
-        return {
-          url: `/colors/${id}`,
+          url: `/products/${productId}/variants/${variantId}`,
           method: "DELETE",
         };
       },
       invalidatesTags: ["updateProfile"],
     }),
 
-    addColor: builder.mutation({
-      query: (data) => {
-        return {
-          url: "/colors",
-          method: "POST",
-          body: data,
-        };
-      },
-      invalidatesTags: ["updateProfile"],
-    }),
-
-    updateColor: builder.mutation({
+    updateProduct: builder.mutation({
       query: ({ formData, id }) => {
         return {
-          url: `/colors/${id}`,
+          url: `/products/${id}`,
           method: "PATCH",
           body: formData,
         };
@@ -240,15 +52,37 @@ const category = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-    //     getUser: builder.query({
-    //       query: () => {
-    //         return {
-    //           url: `/normal-user/get-all-user`,
-    //           method: "GET",
-    //         };
-    //       },
-    //       providesTags: ["updateProfile"],
-    //     }),
+    getSingleProduct: builder.query({
+      query: ({ id }) => {
+        return {
+          url: `/products/${id}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    createProductVeriant: builder.mutation({
+      query: ({ formData, id }) => {
+        return {
+          url: `/products/${id}/variants`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    updateProductVeriant: builder.mutation({
+      query: ({ formData, productId, variantId }) => {
+        return {
+          url: `/products/${productId}/variants/${variantId}`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
     //     getUserAll: builder.query({
     //       query: ({ page, limit }) => {
@@ -396,27 +230,12 @@ const category = baseApi.injectEndpoints({
 });
 
 export const {
-  useGetCategoryQuery,
-  useDeleteCategoriesMutation,
-  useAddCategoryMutation,
-  useUpdateCategoryMutation,
-  useAddSeizeMutation,
-  useDeleteSizeMutation,
-  useGetSizeQuery,
-  useUpdateSizeMutation,
-  useGetColorQuery,
-  useAddColorMutation,
-  useDeleteColorMutation,
-  useUpdateColorMutation,
-  useGetsubCategoryQuery,
-  useAddsubCategoryMutation,
-  useDeletesubCategoriesMutation,
-  useUpdatesubCategoryMutation,
-  useGetAllCategoryQuery,
-  useGetColorCatQuery,
-  useGetSizeCatQuery,
-  useGetBrandsNameQuery,
-  useAddBrandsMutation,
-  useDeleteBrandsMutation,
-  useUpdateBrandsMutation
-} = category;
+  useAddProductMutation,
+  useCreateProductVeriantMutation,
+  useDeleteProductMutation,
+  useGetProductQuery,
+  useGetSingleProductQuery,
+  useUpdateProductMutation,
+  useUpdateProductVeriantMutation,
+  useDeleteVariantProductMutation,
+} = product;

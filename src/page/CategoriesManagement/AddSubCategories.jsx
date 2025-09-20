@@ -24,6 +24,7 @@ const [addCategory] = useAddsubCategoryMutation()
   // const formCategory = category?.data?.result || [];
 
   // Dummy categories
+  //not category data up 20
   const limit = 3
   const page = 1
   const{data:category} = useGetCategoryQuery({limit, page:page})

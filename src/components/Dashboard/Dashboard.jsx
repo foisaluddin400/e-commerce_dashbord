@@ -1,54 +1,65 @@
-import ShopRegistration from "./ShopRegistration";
-import { SubscriptionGrowth } from "./SubscriptionGrowth";
-import UserGrowth from "./UserGrowth";
-import logo1 from '../../assets/header/mm.png'
-import logo2 from '../../assets/header/pp.png'
-import logo3 from '../../assets/header/qq.png'
-import logo4 from '../../assets/header/hh.png'
-import logo5 from '../../assets/header/pp.png'
+import { RiUserForbidLine } from "react-icons/ri";
+
+import BookingGrowth from "./BookingGrowth";
+import ShopRegistration from "./ShopRegister";
+import UserGrowthChart from "./UserGrowthChart";
+import { HiOutlineUserGroup } from "react-icons/hi2";
+import { VscNote } from "react-icons/vsc";
+import { PiMoneyLight } from "react-icons/pi";
 const Dashboard = () => {
   return (
-    <div className=" min-h-screen">
-      <div className=" grid md:grid-cols-4 grid-cols-2 gap-4 text-center pb-3">
-        <div className="bg-white py-6 rounded-md">
-          <p className=" mt-3 text-xl">Total User</p>
-          <div className="flex justify-center my-2">
-            <img src={logo1} alt="" />
+    <div className=" ">
+      <div className="grid grid-cols-4 gap-4">
+        <div className="flex gap-4 items-center bg-white p-6 rounded shadow">
+          <div className="bg-yellow-100 w-[55px] rounded-full h-[55px] flex justify-center items-center text-3xl">
+            <HiOutlineUserGroup className="text-yellow-500" />
           </div>
-          <h1 className="text-3xl font-bold">4,000</h1>
-        </div>
-        <div className="bg-white py-6 rounded-md">
-          <p className=" mt-3 text-xl">Total View</p>
-          <div className="flex justify-center my-2">
-            <img src={logo2} alt="" />
+          <div>
+            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="text-zinc-500"> Total User</h1>
           </div>
-          <h1 className="text-3xl font-bold">4,000</h1>
         </div>
-         <div className="bg-white py-6 rounded-md">
-          <p className=" mt-3 text-xl">Total Order</p>
-          <div className="flex justify-center my-2">
-            <img src={logo3} alt="" />
+        <div className="flex gap-4 items-center bg-white p-6 rounded shadow">
+          <div className="bg-sky-100 w-[55px] rounded-full h-[55px] flex justify-center items-center text-3xl">
+            <RiUserForbidLine className="text-sky-600" />
           </div>
-          <h1 className="text-3xl font-bold">4,000</h1>
-        </div>
-         <div className="bg-white py-6 rounded-md">
-          <p className=" mt-3 text-xl">Total Earning</p>
-          <div className="flex justify-center my-2">
-            <img src={logo4} alt="" />
+          <div>
+            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="text-zinc-500"> User Block</h1>
           </div>
-          <h1 className="text-3xl font-bold">4,000</h1>
         </div>
-      
+        <div className="flex gap-4 items-center bg-white p-6 rounded shadow">
+          <div className="bg-green-100 w-[55px] rounded-full h-[55px] flex justify-center items-center text-3xl">
+            <VscNote className="text-green-500" />
+          </div>
+          <div>
+            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="text-zinc-500"> Total Booking</h1>
+          </div>
+        </div>
+        <div className="flex gap-4 items-center bg-white p-6 rounded shadow">
+          <div className="bg-purple-100 w-[55px] rounded-full h-[55px] flex justify-center items-center text-3xl">
+            <PiMoneyLight className="text-purple-500" />
+          </div>
+          <div>
+            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="text-zinc-500"> Total Earning</h1>
+          </div>
+        </div>
       </div>
-      <div className="lg:grid lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded md:p-3">
-          <SubscriptionGrowth></SubscriptionGrowth>
+      <div className="grid grid-cols-2 gap-4 mt-4 ">
+        <div className="w-full h-full bg-white p-4 rounded shadow">
+          <UserGrowthChart />
         </div>
-        <div className="bg-white rounded mt-3 lg:mt-0">
-          <UserGrowth></UserGrowth>
+        <div className=" bg-white p-4 rounded shadow ">
+          {/* <ActivityStatisticsChart /> */}
+          <BookingGrowth></BookingGrowth>
         </div>
       </div>
-      <ShopRegistration></ShopRegistration>
+
+      <div className="w-full bg-white p-4 rounded shadow mt-4">
+        <ShopRegistration></ShopRegistration>
+      </div>
     </div>
   );
 };

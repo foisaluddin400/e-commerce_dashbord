@@ -9,7 +9,7 @@ import { authSlice } from './features/auth/authSlice';
 const persistConfig = {
     key: "quiz-app",
     storage,
-    blacklist: ["baseApi"], // Prevent persisting API cache
+    blacklist: ["baseApi"],
 };
 
 const rootReducer = combineReducers({

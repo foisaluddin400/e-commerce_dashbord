@@ -1,36 +1,40 @@
-import { Table, Input, Space } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Table, Input, Space, message } from "antd";
+import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { MdModeEditOutline } from "react-icons/md";
 import { LuEye } from "react-icons/lu";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navigate } from "../../Navigate";
+import { useDeleteProductMutation, useGetProductQuery } from "../redux/api/productApi";
 
 const MainProduct = () => {
+  const { data: allProduct } = useGetProductQuery();
+  const [deleteData] = useDeleteProductMutation()
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const navigate = useNavigate();
 
-  const dummyProducts = [
-    {
-      key: "1",
-      sl: 1,
-      name: "T-Shirt",
-      category: "Clothing",
-      subcategory: "Men",
-      price: 100,
-      discountPrice: 80,
-    },
-    {
-      key: "2",
-      sl: 2,
-      name: "Laptop Bag",
-      category: "Accessories",
-      subcategory: "Bags",
-      price: 200,
-      discountPrice: 180,
-    },
-  ];
+  const handleDelete = async (id) => {
+    try {
+      const res = await deleteData(id).unwrap();
+      message.success(res?.message);
+    } catch (err) {
+      message.error(err?.data?.message);
+    }
+  };
+
+  // Convert API data to table data format
+  const tableData =
+    allProduct?.data?.map((item, index) => ({
+      key: item._id,
+      sl: index + 1,
+      name: item.productName,
+      category: item.category?.name,
+      subcategory: item.subcategory?.name,
+      price: item.price,
+      discountPrice: item.discountPercentage,
+      variant: item.variants?.length || 0,
+    })) || [];
 
   const columns = [
     { title: "SL no.", dataIndex: "sl", width: 70, align: "center" },
@@ -38,26 +42,33 @@ const MainProduct = () => {
     { title: "Category", dataIndex: "category" },
     { title: "Subcategory", dataIndex: "subcategory" },
     { title: "Price", dataIndex: "price" },
-    { title: "Discount Price", dataIndex: "discountPrice" },
+    { title: "Discount Percentage", dataIndex: "discountPrice" },
+    { title: "Total Variant", dataIndex: "variant" },
     {
       title: "Action",
       align: "center",
       render: (_, record) => (
         <Space size="middle">
-          <Link to={"/dashboard/product-verient"}>
+          <Link to={`/dashboard/product-verient/${record.key}`}>
             <button>
-              <span className="bg-black text-white w-9 h-9 flex justify-center items-center rounded text-xl">
-                <LuEye />
+              <span className="bg-black text-white flex justify-center items-center rounded py-1 px-3">
+                Veriant
               </span>
             </button>
           </Link>
-          <Link to={"/dashboard/edit-productInfo"}>
+          <Link to={`/dashboard/edit-productInfo/${record.key}`}>
             <button>
               <span className="bg-[#0022FF] text-white w-9 h-9 flex justify-center items-center rounded text-xl">
                 <MdModeEditOutline />
               </span>
             </button>
           </Link>
+          <button
+            className="bg-[#E63946] text-white w-9 h-9 flex justify-center items-center rounded text-xl"
+            onClick={() => handleDelete(record.key)}
+          >
+            <DeleteOutlined />
+          </button>
         </Space>
       ),
     },
@@ -82,10 +93,10 @@ const MainProduct = () => {
           </div>
         </div>
       </div>
-   
+
       <Table
         columns={columns}
-        dataSource={dummyProducts}
+        dataSource={tableData}
         pagination={false}
         className="custom-table"
         scroll={{ x: "max-content" }}

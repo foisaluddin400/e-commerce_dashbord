@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { Table, Modal, Button, Space, Image, Input, Select } from "antd";
+import {
+  Table,
+  Modal,
+  Button,
+  Space,
+  Image,
+  Input,
+  Select,
+  message,
+} from "antd";
 import {
   EyeOutlined,
   EditOutlined,
@@ -8,13 +17,25 @@ import {
 } from "@ant-design/icons";
 import { Navigate } from "../../Navigate";
 import { FaRegEdit } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import image from "../../assets/header/image.png";
+import {
+  useDeleteVariantProductMutation,
+  useGetSingleProductQuery,
+  useUpdateProductVeriantMutation,
+} from "../redux/api/productApi";
+import { imageUrl } from "../redux/api/baseApi";
 const { Option } = Select;
 
 const AddProduct = () => {
+  const { id } = useParams();
+  const { data: variantProduct } = useGetSingleProductQuery({ id });
+  console.log(variantProduct);
+  const [deleteData] = useDeleteVariantProductMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const[updateStatus] = useUpdateProductVeriantMutation()
+
   const [statusModal, setStatusModal] = useState({
     open: false,
     type: "",
@@ -26,108 +47,94 @@ const AddProduct = () => {
     value: "",
   });
 
-  const [products, setProducts] = useState([
-    {
-      key: "1",
-      name: "T-Shirt",
-      price: 1200,
-      size: "M",
-      fontImage: image,
-      backImage: image,
-      category: "Clothing",
-      subcategory: "Men",
-      stock: 20,
-      discountPrice: 1000,
-      color: "Red",
-      status: "Visible",
-      stockStatus: "In Stock",
-    },
-    {
-      key: "2",
-      name: "Hoodie",
-      price: 2200,
-      size: "L",
-      fontImage: image,
-      backImage: image,
-      category: "Clothing",
-      subcategory: "Women",
-      stock: 15,
-      discountPrice: 1800,
-      color: "Black",
-      status: "Hidden",
-      stockStatus: "Stock Out",
-    },
+  const handleDelete = async (variantId) => {
+    try {
+      const res = await deleteData({
+        productId: id,
+        variantId: variantId,
+      }).unwrap();
+      message.success(res?.message);
+    } catch (err) {
+      message.error(err?.data?.message);
+    }
+  };
 
-    {
-      key: "3",
-      name: "Hoodie",
-      price: 2200,
-      size: "L",
-      fontImage: image,
-      backImage: image,
-      category: "Clothing",
-      subcategory: "Women",
-      stock: 15,
-      discountPrice: 1800,
-      color: "Black",
-      status: "Hidden",
-      stockStatus: "Stock Out",
-    },
+  const products =
+    variantProduct?.data?.variants?.map((variant, index) => ({
+      key: index + 1,
+      id: variant?._id,
+      productId: variantProduct?.data?._id,
+      name: variantProduct?.data?.productName,
+      price: variantProduct?.data?.price,
+      discountPrice: variantProduct?.data?.discountPercentage,
+      size: variant?.size?.map((s) => s.name).join(", "),
+      fontImage: `${imageUrl}/${variant?.frontImage}`,
+      backImage: `${imageUrl}/${variant?.backImage}`,
+      category: variantProduct?.data?.category?.name,
+      subcategory: variantProduct?.data?.subcategory?.name,
+      color: variant?.color?.name,
+      status: variant?.status,
+      stockStatus: variant?.stockStatus,
+      stock: 10,
+    })) || [];
+  console.log(products);
 
-    {
-      key: "4",
-      name: "Hoodie",
-      price: 2200,
-      size: "L",
-      fontImage: image,
-      backImage: image,
-      category: "Clothing",
-      subcategory: "Women",
-      stock: 15,
-      discountPrice: 1800,
-      color: "Black",
-      status: "Hidden",
-      stockStatus: "Stock Out",
-    },
 
-    {
-      key: "5",
-      name: "Hoodie",
-      price: 2200,
-      size: "L",
-      fontImage: image,
-      backImage: image,
-      category: "Clothing",
-      subcategory: "Women",
-      stock: 15,
-      discountPrice: 1800,
-      color: "Black",
-      status: "Hidden",
-      stockStatus: "Stock Out",
-    },
-  ]);
 
-  // Handle status change
-  const handleStatusUpdate = (record) => {
-    const updated = products.map((p) =>
-      p.key === record.key
-        ? { ...p, status: record.status === "Visible" ? "Hidden" : "Visible" }
-        : p
-    );
-    setProducts(updated);
+
+
+
+
+// Handle status change (API integration)
+const handleStatusUpdate = async (record) => {
+  try {
+    const newStatus = record.status === "Visible" ? "Hidden" : "Visible";
+
+    const formData = { status: newStatus };
+
+    const res = await updateStatus({
+      formData,
+      productId: record.productId,
+      variantId: record.id, 
+    }).unwrap();
+
+    message.success(res?.message);
+
+
+
     setStatusModal({ open: false, type: "", record: null });
-  };
+  } catch (err) {
+    message.error(err?.data?.message || "Failed to update status");
+  }
+};
 
-  // Handle stock status update
-  const handleStockUpdate = () => {
-    const updated = products.map((p) =>
-      p.key === stockModal.record.key
-        ? { ...p, stockStatus: stockModal.value }
-        : p
-    );
-    setProducts(updated);
+// Handle stock status update (API integration)
+const handleStockUpdate = async () => {
+  try {
+    const formData = { stockStatus: stockModal.value };
+
+    console.log(stockModal.record.id)
+    console.log(stockModal.record.productId)
+
+    const res = await updateStatus({
+      formData,
+      productId: stockModal.record.productId,
+      variantId: stockModal.record.id, 
+    }).unwrap();
+
+    message.success(res?.message);
+
+
+
     setStockModal({ open: false, record: null, value: "" });
-  };
+  } catch (err) {
+    message.error(err?.data?.message);
+  }
+};
+
+
+
+ 
 
   const columns = [
     {
@@ -161,16 +168,21 @@ const AddProduct = () => {
       key: "size",
     },
     {
+      title: "Color",
+      dataIndex: "color",
+      key: "color",
+    },
+    {
       title: "Front Image",
       dataIndex: "fontImage",
       key: "fontImage",
-      render: (img) => <Image width={35} src={img} />,
+      render: (img) => <Image width={45} src={img} />,
     },
     {
       title: "Back Image",
       dataIndex: "backImage",
       key: "backImage",
-      render: (img) => <Image width={35} src={img} />,
+      render: (img) => <Image width={45} src={img} />,
     },
     {
       title: "Status",
@@ -225,13 +237,16 @@ const AddProduct = () => {
               setIsModalOpen(true);
             }}
           />
-          <Link to={"/dashboard/edit-product"}>
+          <Link
+            to={`/dashboard/edit-product/${record?.productId}/${record?.id}`}
+          >
             <Button
               className="bg-green-700 text-white border-none"
               icon={<EditOutlined />}
             />
           </Link>
           <Button
+            onClick={() => handleDelete(record.id)}
             className="bg-[#E63946] text-white border-none"
             icon={<DeleteOutlined />}
           />
@@ -262,7 +277,7 @@ const AddProduct = () => {
             style={{ maxWidth: "500px", height: "40px" }}
           />
           <div>
-            <Link to={"/dashboard/add-verient"}>
+            <Link to={`/dashboard/add-verient/${id}`}>
               {" "}
               <button className="bg-[#E63946] w-[150px] text-white py-2 rounded">
                 Add Verient
@@ -278,7 +293,6 @@ const AddProduct = () => {
         pagination={false}
         className="custom-table"
         scroll={{ x: "max-content" }}
-        rowClassName={() => "border-b border-gray-200"}
       />
 
       {/* Product Details Modal */}
@@ -371,7 +385,7 @@ const AddProduct = () => {
         >
           <Option value="In Stock">In Stock</Option>
           <Option value="Stock Out">Stock Out</Option>
-          <Option value="Upcoming">Upcoming</Option>
+        
         </Select>
       </Modal>
     </div>

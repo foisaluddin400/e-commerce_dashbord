@@ -33,6 +33,7 @@ import ProtectedRoute from "../protectedRoute/ProtectedRoute";
 import MainProduct from "../page/product/MainProduct";
 import AddVerient from "../page/product/AddVerient";
 import EditProductInfo from "../page/product/EditProductInfo";
+import Brands from "../page/brands/Brands";
 
 
 export const router = createBrowserRouter([
@@ -85,7 +86,7 @@ export const router = createBrowserRouter([
         element: <MainProduct></MainProduct>
       },
       {
-        path: "/dashboard/product-verient",
+        path: "/dashboard/product-verient/:id",
         element: <AddProduct></AddProduct>
       },
       {
@@ -93,20 +94,24 @@ export const router = createBrowserRouter([
         element: <ProductAddPage></ProductAddPage>
       },
       {
-        path: "/dashboard/edit-productInfo",
+        path: "/dashboard/edit-productInfo/:id",
         element: <EditProductInfo></EditProductInfo>
       },
         {
-        path: "/dashboard/add-verient",
+        path: "/dashboard/add-verient/:id",
         element: <AddVerient></AddVerient>
       },
         {
-        path: "/dashboard/edit-product",
+        path: "/dashboard/edit-product/:productId/:variantId",
         element: <EditPRoduct></EditPRoduct>
       },
       {
         path: "/dashboard/color",
         element:<Color></Color>
+      },
+        {
+        path: "/dashboard/brands",
+        element:<Brands></Brands>
       },
       {
         path: "/dashboard/size",

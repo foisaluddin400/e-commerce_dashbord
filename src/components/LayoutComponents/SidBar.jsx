@@ -77,6 +77,12 @@ const items = [
     link: "/dashboard/color",
   },
   {
+    key: "brands",
+    label: "Brands",
+    icon: <VscSymbolColor />,
+    link: "/dashboard/brands",
+  },
+  {
     key: "product",
     label: "Product",
     icon: <TbTiltShift />,
