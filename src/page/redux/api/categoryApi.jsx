@@ -3,7 +3,7 @@ import { baseApi } from "./baseApi";
 const category = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getCategory: builder.query({
-      query: ({limit,page}) => {
+      query: ({ limit, page }) => {
         return {
           url: `/categories?limit=${limit}&page=${page}`,
           method: "GET",
@@ -12,7 +12,7 @@ const category = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-     getBrandsName: builder.query({
+    getBrandsName: builder.query({
       query: () => {
         return {
           url: `/brands`,
@@ -22,8 +22,7 @@ const category = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
- deleteBrands: builder.mutation({
+    deleteBrands: builder.mutation({
       query: (id) => {
         return {
           url: `/brands/${id}`,
@@ -54,7 +53,7 @@ const category = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-     getAllCategory: builder.query({
+    getAllCategory: builder.query({
       query: ({ page, limit, search }) => {
         return {
           url: `/categories?search=${search}&page=${page}&limit=${limit}`,
@@ -137,7 +136,7 @@ const category = baseApi.injectEndpoints({
     }),
 
     getSize: builder.query({
-      query: ({page, limit, search}) => {
+      query: ({ page, limit, search }) => {
         return {
           url: `/sizes?search=${search}&page=${page}&limit=${limit}`,
           method: "GET",
@@ -189,7 +188,7 @@ const category = baseApi.injectEndpoints({
     }),
 
     getColor: builder.query({
-      query: ({page, limit, search}) => {
+      query: ({ page, limit, search }) => {
         return {
           url: `/colors?search=${search}&page=${page}&limit=${limit}`,
           method: "GET",
@@ -198,7 +197,7 @@ const category = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-      getColorCat: builder.query({
+    getColorCat: builder.query({
       query: () => {
         return {
           url: `/colors`,
@@ -418,5 +417,5 @@ export const {
   useGetBrandsNameQuery,
   useAddBrandsMutation,
   useDeleteBrandsMutation,
-  useUpdateBrandsMutation
+  useUpdateBrandsMutation,
 } = category;

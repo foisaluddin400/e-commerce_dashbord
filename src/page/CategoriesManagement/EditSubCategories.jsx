@@ -8,7 +8,8 @@ const EditSubCategories = ({
   setEditModal,
   selectedCategory,
 }) => {
-  console.log("Selected Subcategory:", selectedCategory?.categoryId?._id);
+  console.log("Selected Subcategory:", selectedCategory);
+
 
   // const [updateSub] = useUpdateSubCategoryMutation();
   const [form] = Form.useForm();
@@ -68,7 +69,7 @@ const [editSub] = useUpdatesubCategoryMutation()
         formData.append("image", file.originFileObj);
       });
       formData.append("name", values.name);
-       formData.append("parentCategoryId", selectedCategory?.categoryId?._id );
+       formData.append("category", selectedCategory?.categoryId );
 
       const res = await editSub({ formData, id: selectedCategory?.key });
       console.log(res);

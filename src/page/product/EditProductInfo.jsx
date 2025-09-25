@@ -6,7 +6,7 @@ import {
   useGetSingleProductQuery,
   useUpdateProductMutation,
 } from "../redux/api/productApi";
-import { useGetCategoryQuery } from "../redux/api/categoryApi";
+import { useGetBrandsNameQuery, useGetCategoryQuery } from "../redux/api/categoryApi";
 import { useParams } from "react-router-dom";
 
 const { Option } = Select;
@@ -19,6 +19,7 @@ const EditProductInfo = () => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
   console.log(content)
+  const { data: brands, isLoading } = useGetBrandsNameQuery();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form] = Form.useForm();
 
@@ -33,6 +34,7 @@ const EditProductInfo = () => {
       form.setFieldsValue({
         productName: product.productName,
         category: product.category?._id || null,
+        brand: product.brand?._id || null,
         subcategory: product.subcategory?._id || null,
         price: product.price,
         discountPrice: product.discountPercentage,
@@ -53,6 +55,7 @@ const EditProductInfo = () => {
       formData.append("category", values.category);
       formData.append("subcategory", values.subcategory);
       formData.append("price", values.price);
+        formData.append("brand", values.brand);
       formData.append("discountPercentage", values.discountPrice);
 
       const res = await updateProduct({ formData, id });
@@ -134,7 +137,24 @@ const EditProductInfo = () => {
         </div>
 
         {/* Price Section */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-3 gap-4 mt-4">
+             <Form.Item
+            label="Brand"
+            name="brand"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select
+              style={{ height: "45px" }}
+              placeholder="Select Category"
+              onChange={(value) => setSelectedCategory(value)}
+            >
+              {brands?.data?.map((cat) => (
+                <Option key={cat._id} value={cat._id}>
+                  {cat.brandName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
           <Form.Item
             label="Price"
             name="price"

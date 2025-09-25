@@ -3,7 +3,10 @@ import React, { useRef, useState } from "react";
 import { Navigate } from "../../Navigate";
 import JoditEditor from "jodit-react";
 import { useAddProductMutation } from "../redux/api/productApi";
-import { useGetCategoryQuery } from "../redux/api/categoryApi";
+import {
+  useGetBrandsNameQuery,
+  useGetCategoryQuery,
+} from "../redux/api/categoryApi";
 
 const { Option } = Select;
 
@@ -16,6 +19,7 @@ const ProductAddPage = () => {
   const limit = 10;
   const page = 1;
   const { data: categoryData } = useGetCategoryQuery({ limit, page });
+  const { data: brands, isLoading } = useGetBrandsNameQuery();
   const [addProduct] = useAddProductMutation();
 
   const handleSubmit = async (values) => {
@@ -26,7 +30,8 @@ const ProductAddPage = () => {
       formData.append("description", content);
       formData.append("shortDescription", values.shortDescription);
       formData.append("category", values.category);
-      formData.append("subcategory", values.subcategory); 
+      formData.append("brand", values.brand);
+      formData.append("subcategory", values.subcategory);
       formData.append("price", values.price);
       formData.append("discountPercentage", values.discountPrice);
 
@@ -68,9 +73,14 @@ const ProductAddPage = () => {
           <Form.Item
             label="Product Name"
             name="productName"
-            rules={[{ required: true, message: "Please enter the product name" }]}
+            rules={[
+              { required: true, message: "Please enter the product name" },
+            ]}
           >
-            <Input style={{ height: "45px" }} placeholder="Enter product name" />
+            <Input
+              style={{ height: "45px" }}
+              placeholder="Enter product name"
+            />
           </Form.Item>
 
           {/* Category */}
@@ -111,7 +121,24 @@ const ProductAddPage = () => {
         </div>
 
         {/* Price Section */}
-        <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="grid grid-cols-3 gap-4 mt-4">
+          <Form.Item
+            label="Brand"
+            name="brand"
+            rules={[{ required: true, message: "Please select a category" }]}
+          >
+            <Select
+              style={{ height: "45px" }}
+              placeholder="Select Category"
+              onChange={(value) => setSelectedCategory(value)}
+            >
+              {brands?.data?.map((cat) => (
+                <Option key={cat._id} value={cat._id}>
+                  {cat.brandName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
           <Form.Item
             label="Price"
             name="price"

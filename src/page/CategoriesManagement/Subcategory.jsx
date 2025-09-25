@@ -22,6 +22,7 @@ const Subcategory = () => {
     page: currentPage,
     limit: pageSize,
   });
+  console.log(subCategoryData)
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -49,8 +50,8 @@ const Subcategory = () => {
     key: item?._id,
     sl: (currentPage - 1) * pageSize + (index + 1),
     name: item?.name,
-    categoryId: item?.parentCategoryId,
-    categoryName: item?.parentCategoryId?.name,
+    categoryId: item?.category?._id,
+    categoryName: item?.category?.name,
     subImage: item?.imageUrl
       ? `${imageUrl}${item?.imageUrl}`
       : "https://via.placeholder.com/70",

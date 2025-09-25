@@ -1,4 +1,4 @@
-import { Form, Input, Modal, Select, Upload } from "antd";
+import { Form, Input, message, Modal, Select, Upload } from "antd";
 import React, { useState } from "react";
 import { useAddsubCategoryMutation, useGetCategoryQuery } from "../redux/api/categoryApi";
 // import { useAddSubCategoryMutation, useGetCategroyQuery } from "../redux/api/productManageApi";
@@ -56,7 +56,7 @@ const [addCategory] = useAddsubCategoryMutation()
         formData.append("image", file.originFileObj);
       });
       formData.append("name", values.name);
-       formData.append("parentCategoryId", values.category);
+       formData.append("category", values.category);
 
       const res = await addCategory(formData);
       console.log(res);

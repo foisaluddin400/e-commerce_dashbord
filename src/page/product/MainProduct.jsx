@@ -30,15 +30,18 @@ const MainProduct = () => {
       sl: index + 1,
       name: item.productName,
       category: item.category?.name,
+       brand: item.brand?.brandName,
       subcategory: item.subcategory?.name,
       price: item.price,
       discountPrice: item.discountPercentage,
       variant: item.variants?.length || 0,
     })) || [];
+    console.log(allProduct)
 
   const columns = [
     { title: "SL no.", dataIndex: "sl", width: 70, align: "center" },
     { title: "Product Name", dataIndex: "name" },
+    { title: "Brand", dataIndex: "brand" },
     { title: "Category", dataIndex: "category" },
     { title: "Subcategory", dataIndex: "subcategory" },
     { title: "Price", dataIndex: "price" },
