@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Form, Input, Modal, message } from "antd";
+import { Form, Input, Modal, Spin, message } from "antd";
 import { useUpdateColorMutation } from "../redux/api/categoryApi";
 
 const EditColor = ({ editModal, setEditModal, selectedCategory }) => {
   const [form] = Form.useForm();
   const [colorHex, setColorHex] = useState("#000000");
   const [updateColor] = useUpdateColorMutation();
-
+  const [loading, setLoading] = useState(false);
   // 🟢 Set default form values when selectedCategory changes
   useEffect(() => {
     if (selectedCategory) {
@@ -26,20 +26,25 @@ const EditColor = ({ editModal, setEditModal, selectedCategory }) => {
   };
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
       const formData = {
-  
         name: values.colorName,
         hexValue: values.colorHex,
       };
 
-    const res = await updateColor({formData ,id: selectedCategory.key}).unwrap();
+      const res = await updateColor({
+        formData,
+        id: selectedCategory.key,
+      }).unwrap();
       console.log("API Response:", res);
 
       message.success("Color updated successfully!");
+      setLoading(false);
       handleCancel();
     } catch (err) {
       console.error(err);
+      setLoading(false);
       message.error("Failed to update color");
     }
   };
@@ -112,10 +117,22 @@ const EditColor = ({ editModal, setEditModal, selectedCategory }) => {
           {/* Buttons */}
           <div className="flex gap-3 mt-4">
             <button
+              className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                loading
+                  ? "bg-[#fa8e97] cursor-not-allowed"
+                  : "bg-[#E63946] hover:bg-[#941822]"
+              }`}
               type="submit"
-              className="px-4 py-3 w-full bg-[#D17C51] text-white rounded-md"
+              disabled={loading}
             >
-              Update
+              {loading ? (
+                <>
+                  <Spin size="small" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                "Submit"
+              )}
             </button>
             <button
               type="button"

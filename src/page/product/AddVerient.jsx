@@ -1,4 +1,4 @@
-import { Form, message, Select, Upload } from "antd";
+import { Form, message, Select, Spin, Upload } from "antd";
 import React, { useState } from "react";
 import { Navigate } from "../../Navigate";
 import {
@@ -31,6 +31,7 @@ const AddVerient = () => {
   const { id } = useParams();
   const { data: colorData } = useGetColorCatQuery();
   console.log(colorData);
+  const [loading, setLoading] = useState(false);
   const { data: sizeData } = useGetSizeCatQuery();
   const [addVerientProduct] = useCreateProductVeriantMutation();
 
@@ -41,6 +42,7 @@ const AddVerient = () => {
   const [form] = Form.useForm();
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -68,7 +70,7 @@ const AddVerient = () => {
 
       const res = await addVerientProduct({ formData, id }).unwrap();
       message.success(res.message);
-
+      setLoading(false);
       // Reset form and images
       form.resetFields();
       setFrontImageList([]);
@@ -77,6 +79,7 @@ const AddVerient = () => {
       setLeftImageList([]);
     } catch (error) {
       console.error(error);
+      setLoading(false);
       message.error(error?.data?.message || "Something went wrong");
     }
   };
@@ -220,10 +223,22 @@ const AddVerient = () => {
         {/* Submit */}
         <div className="flex gap-3 mt-4">
           <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#fa8e97] cursor-not-allowed"
+                : "bg-[#E63946] hover:bg-[#941822]"
+            }`}
             type="submit"
-            className="px-4 py-3 w-full bg-[#E63946] text-white rounded-md"
+            disabled={loading}
           >
-            Add Product
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </Form>

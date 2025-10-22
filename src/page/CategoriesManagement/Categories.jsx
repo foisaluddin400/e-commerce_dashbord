@@ -39,13 +39,11 @@ const Categories = () => {
     }
   };
 
-  // ✏️ Edit Handler
   const handleEdit = (record) => {
     setSelectedCategory(record);
     setEditModal(true);
   };
 
-  // 📝 Table Columns
   const columns = [
     {
       title: "SL No.",
@@ -72,6 +70,7 @@ const Categories = () => {
       key: "name",
       align: "center",
     },
+
     {
       title: "Actions",
       key: "actions",

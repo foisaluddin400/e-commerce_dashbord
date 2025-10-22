@@ -1,4 +1,4 @@
-import { Form, Input, message, Select, Upload } from "antd";
+import { Form, Input, message, Select, Spin, Upload } from "antd";
 import React, { useRef, useState } from "react";
 import { Navigate } from "../../Navigate";
 import JoditEditor from "jodit-react";
@@ -24,6 +24,7 @@ const onPreview = async (file) => {
   imgWindow?.document.write(image.outerHTML);
 };
 const ProductAddPage = () => {
+  const [loading, setLoading] = useState(false);
   const editor = useRef(null);
   const [content, setContent] = useState("");
   const [fileList, setFileList] = useState([]);
@@ -40,6 +41,7 @@ const ProductAddPage = () => {
   const [addProduct] = useAddProductMutation();
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -58,12 +60,15 @@ const ProductAddPage = () => {
       if (res?.data?.success) {
         message.success(res.data.message);
         form.resetFields();
+        setLoading(false);
         setContent("");
       } else {
+        setLoading(false);
         message.error("Something went wrong");
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       message.error("Failed to add product");
     }
   };
@@ -212,10 +217,22 @@ const ProductAddPage = () => {
         {/* Submit */}
         <div className="flex gap-3 mt-4">
           <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#fa8e97] cursor-not-allowed"
+                : "bg-[#E63946] hover:bg-[#941822]"
+            }`}
             type="submit"
-            className="px-4 py-3 w-full bg-[#E63946] text-white rounded-md"
+            disabled={loading}
           >
-            Add Product
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </Form>

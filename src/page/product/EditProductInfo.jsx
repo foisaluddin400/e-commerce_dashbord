@@ -1,4 +1,4 @@
-import { Form, Input, message, Select, Upload } from "antd";
+import { Form, Input, message, Select, Spin, Upload } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { Navigate } from "../../Navigate";
 import JoditEditor from "jodit-react";
@@ -6,7 +6,10 @@ import {
   useGetSingleProductQuery,
   useUpdateProductMutation,
 } from "../redux/api/productApi";
-import { useGetBrandsNameQuery, useGetCategoryQuery } from "../redux/api/categoryApi";
+import {
+  useGetBrandsNameQuery,
+  useGetCategoryQuery,
+} from "../redux/api/categoryApi";
 import { useParams } from "react-router-dom";
 import { imageUrl } from "../redux/api/baseApi";
 
@@ -27,13 +30,13 @@ const onPreview = async (file) => {
 };
 const EditProductInfo = () => {
   const { id } = useParams();
-    const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState([]);
   const { data: singleProduct } = useGetSingleProductQuery({ id });
   const [updateProduct] = useUpdateProductMutation();
-
+  const [loading, setLoading] = useState(false);
   const editor = useRef(null);
   const [content, setContent] = useState("");
-  console.log(content)
+  console.log(content);
   const { data: brands, isLoading } = useGetBrandsNameQuery();
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form] = Form.useForm();
@@ -42,7 +45,7 @@ const EditProductInfo = () => {
   const page = 1;
   const { data: categoryData } = useGetCategoryQuery({ limit, page });
 
-   const onChange = ({ fileList: newFileList }) => {
+  const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
 
@@ -58,20 +61,21 @@ const EditProductInfo = () => {
         discountPrice: product.discountPercentage,
         shortDescription: product.shortDescription,
       });
-       setFileList([
-              {
-                uid: "-1",
-                name: "category-image.png",
-                status: "done",
-                url: `${imageUrl}${product?.thumbnail}`,
-              },
-            ]);
+      setFileList([
+        {
+          uid: "-1",
+          name: "category-image.png",
+          status: "done",
+          url: `${imageUrl}${product?.thumbnail}`,
+        },
+      ]);
       setContent(product.description || "");
       setSelectedCategory(product.category?._id || null);
     }
   }, [singleProduct, form]);
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -81,7 +85,7 @@ const EditProductInfo = () => {
       formData.append("category", values.category);
       formData.append("subcategory", values.subcategory);
       formData.append("price", values.price);
-        formData.append("brand", values.brand);
+      formData.append("brand", values.brand);
       formData.append("discountPercentage", values.discountPrice);
       fileList.forEach((file) => {
         formData.append("image", file.originFileObj);
@@ -89,11 +93,14 @@ const EditProductInfo = () => {
       const res = await updateProduct({ formData, id });
       if (res?.data?.success) {
         message.success(res.data.message);
+        setLoading(false);
       } else {
         message.error("Something went wrong");
+        setLoading(false);
       }
     } catch (error) {
       console.error(error);
+      setLoading(false);
       message.error("Failed to update product");
     }
   };
@@ -118,24 +125,29 @@ const EditProductInfo = () => {
       <Navigate title={"Edit Product"} />
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Main Product Info */}
-           <Form.Item label="Photos">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onChange={onChange}
-                onPreview={onPreview}
-                multiple={true}
-              >
-                {fileList.length < 1 && "+ Upload"}
-              </Upload>
-            </Form.Item>
+        <Form.Item label="Photos">
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            onChange={onChange}
+            onPreview={onPreview}
+            multiple={true}
+          >
+            {fileList.length < 1 && "+ Upload"}
+          </Upload>
+        </Form.Item>
         <div className="grid grid-cols-3 gap-4">
           <Form.Item
             label="Product Name"
             name="productName"
-            rules={[{ required: true, message: "Please enter the product name" }]}
+            rules={[
+              { required: true, message: "Please enter the product name" },
+            ]}
           >
-            <Input style={{ height: "45px" }} placeholder="Enter product name" />
+            <Input
+              style={{ height: "45px" }}
+              placeholder="Enter product name"
+            />
           </Form.Item>
 
           {/* Category */}
@@ -177,7 +189,7 @@ const EditProductInfo = () => {
 
         {/* Price Section */}
         <div className="grid grid-cols-3 gap-4 mt-4">
-             <Form.Item
+          <Form.Item
             label="Brand"
             name="brand"
             rules={[{ required: true, message: "Please select a category" }]}
@@ -224,23 +236,33 @@ const EditProductInfo = () => {
           <Input.TextArea placeholder="Enter description" rows={4} />
         </Form.Item>
 
-    
-          <JoditEditor
-            ref={editor}
-            value={content}
-            config={config}
-            tabIndex={1}
-            onBlur={(newContent) => setContent(newContent)}
-          />
-    
+        <JoditEditor
+          ref={editor}
+          value={content}
+          config={config}
+          tabIndex={1}
+          onBlur={(newContent) => setContent(newContent)}
+        />
 
         {/* Submit */}
         <div className="flex gap-3 mt-4">
           <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#fa8e97] cursor-not-allowed"
+                : "bg-[#E63946] hover:bg-[#941822]"
+            }`}
             type="submit"
-            className="px-4 py-3 w-full bg-[#E63946] text-white rounded-md"
+            disabled={loading}
           >
-            Update Product
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </div>
       </Form>

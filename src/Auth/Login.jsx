@@ -1,30 +1,35 @@
-import { Button, Checkbox, Form, Input, message } from "antd";
+import { Button, Checkbox, Form, Input, message, Spin } from "antd";
 import img from "../assets/header/login.png";
 import { Link, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaGoogle, FaFacebookF } from "react-icons/fa";
 import { useLoginAdminMutation } from "../page/redux/api/userApi";
 import { useDispatch } from "react-redux";
 import { setToken } from "../page/redux/features/auth/authSlice";
+import { useState } from "react";
 
 const Login = () => {
   const [loginAdmin] = useLoginAdminMutation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+    const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const onFinish = async (values) => {
     console.log(values);
+    setLoading(true);
     try {
       const payload = await loginAdmin(values).unwrap();
       console.log(payload);
       if (payload) {
         dispatch(setToken(payload?.data?.accessToken));
         message.success(payload?.message);
+        setLoading(false);
         navigate("/");
       } else {
         message.error(payload?.message );
       }
     } catch (error) {
       console.error("Login error:", error);
+      setLoading(false);
       message.error(error?.data?.message || "Server is down");
     } finally {
     }
@@ -87,49 +92,28 @@ const Login = () => {
 
               {/* Continue Button */}
               <Form.Item>
-                <button
-                  htmlType="submit"
-                  className="w-full bg-[#E63946] py-3 text-white rounded-md hover:bg-primary-dark transition-colors"
-                >
-                  Continue
-                </button>
+               <button
+                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                      loading
+                        ? "bg-[#fa8e97] cursor-not-allowed"
+                        : "bg-[#E63946] hover:bg-[#941822]"
+                    }`}
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spin size="small" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      "Log In"
+                    )}
+                  </button>
               </Form.Item>
             </Form>
 
-            {/* Divider */}
-            <div className="flex items-center mb-6">
-              <hr className="flex-grow border-gray-300" />
-              <span className="mx-2 text-gray-500 text-sm">Or</span>
-              <hr className="flex-grow border-gray-300" />
-            </div>
-
-            {/* Google */}
-            <Button
-              style={{ height: "50px" }}
-              block
-              className="flex items-center justify-center border border-gray-300 mb-3"
-            >
-              <FaGoogle className="text-red-500 mr-2" /> Continue With Google
-            </Button>
-
-            {/* Facebook */}
-            <Button
-              style={{ height: "50px" }}
-              block
-              className="flex items-center justify-center border border-gray-300"
-            >
-              <FaFacebookF className="text-blue-600 mr-2" /> Continue With
-              Facebook
-            </Button>
-
-            {/* Sign In Link */}
-            <p className="text-center text-sm text-gray-600 mt-6">
-              Don.t have an account?{" "}
-              <Link to={"/auth/signUp"}>
-                {" "}
-                <span className="text-blue-600 cursor-pointer">Sign Up</span>
-              </Link>
-            </p>
+          
           </div>
         </div>
       </div>
