@@ -95,6 +95,12 @@ const items = [
     link: "/dashboard/blogs",
   },
   {
+    key: "icons",
+    label: "Customized Icon",
+    icon: <TbLogs />,
+    link: "/dashboard/CustomizedIcon",
+  },
+  {
     key: "support",
     label: "Support",
     icon: <MdContactSupport />,
@@ -259,7 +265,7 @@ const SidBar = () => {
                     <Link
                       key={child.key}
                       to={child.link}
-                      className={`menu-item p-2 flex items-center cursor-pointer ${
+                      className={`menu-item p-2 flex items-center cursor-pointer border-l-2 border-[#E63946] ${
                         selectedKey === child.key
                           ? "bg-[#E63946] text-white"
                           : "hover:bg-gray-200"

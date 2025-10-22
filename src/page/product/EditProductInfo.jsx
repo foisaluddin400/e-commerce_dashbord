@@ -1,4 +1,4 @@
-import { Form, Input, message, Select } from "antd";
+import { Form, Input, message, Select, Upload } from "antd";
 import React, { useEffect, useRef, useState } from "react";
 import { Navigate } from "../../Navigate";
 import JoditEditor from "jodit-react";
@@ -8,11 +8,26 @@ import {
 } from "../redux/api/productApi";
 import { useGetBrandsNameQuery, useGetCategoryQuery } from "../redux/api/categoryApi";
 import { useParams } from "react-router-dom";
+import { imageUrl } from "../redux/api/baseApi";
 
 const { Option } = Select;
-
+const onPreview = async (file) => {
+  let src = file.url;
+  if (!src) {
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.originFileObj);
+      reader.onload = () => resolve(reader.result);
+    });
+  }
+  const image = new Image();
+  image.src = src;
+  const imgWindow = window.open(src);
+  imgWindow?.document.write(image.outerHTML);
+};
 const EditProductInfo = () => {
   const { id } = useParams();
+    const [fileList, setFileList] = useState([]);
   const { data: singleProduct } = useGetSingleProductQuery({ id });
   const [updateProduct] = useUpdateProductMutation();
 
@@ -27,7 +42,10 @@ const EditProductInfo = () => {
   const page = 1;
   const { data: categoryData } = useGetCategoryQuery({ limit, page });
 
- 
+   const onChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
+
   useEffect(() => {
     if (singleProduct?.data) {
       const product = singleProduct.data;
@@ -40,6 +58,14 @@ const EditProductInfo = () => {
         discountPrice: product.discountPercentage,
         shortDescription: product.shortDescription,
       });
+       setFileList([
+              {
+                uid: "-1",
+                name: "category-image.png",
+                status: "done",
+                url: `${imageUrl}${product?.thumbnail}`,
+              },
+            ]);
       setContent(product.description || "");
       setSelectedCategory(product.category?._id || null);
     }
@@ -57,7 +83,9 @@ const EditProductInfo = () => {
       formData.append("price", values.price);
         formData.append("brand", values.brand);
       formData.append("discountPercentage", values.discountPrice);
-
+      fileList.forEach((file) => {
+        formData.append("image", file.originFileObj);
+      });
       const res = await updateProduct({ formData, id });
       if (res?.data?.success) {
         message.success(res.data.message);
@@ -90,6 +118,17 @@ const EditProductInfo = () => {
       <Navigate title={"Edit Product"} />
       <Form form={form} onFinish={handleSubmit} layout="vertical">
         {/* Main Product Info */}
+           <Form.Item label="Photos">
+              <Upload
+                listType="picture-card"
+                fileList={fileList}
+                onChange={onChange}
+                onPreview={onPreview}
+                multiple={true}
+              >
+                {fileList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
         <div className="grid grid-cols-3 gap-4">
           <Form.Item
             label="Product Name"

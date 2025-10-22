@@ -1,4 +1,4 @@
-import { Form, Input, message, Select } from "antd";
+import { Form, Input, message, Select, Upload } from "antd";
 import React, { useRef, useState } from "react";
 import { Navigate } from "../../Navigate";
 import JoditEditor from "jodit-react";
@@ -9,12 +9,29 @@ import {
 } from "../redux/api/categoryApi";
 
 const { Option } = Select;
-
+const onPreview = async (file) => {
+  let src = file.url;
+  if (!src) {
+    src = await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file.originFileObj);
+      reader.onload = () => resolve(reader.result);
+    });
+  }
+  const image = new Image();
+  image.src = src;
+  const imgWindow = window.open(src);
+  imgWindow?.document.write(image.outerHTML);
+};
 const ProductAddPage = () => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
+  const [fileList, setFileList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [form] = Form.useForm();
+  const onChange = ({ fileList: newFileList }) => {
+    setFileList(newFileList);
+  };
 
   const limit = 10;
   const page = 1;
@@ -34,7 +51,9 @@ const ProductAddPage = () => {
       formData.append("subcategory", values.subcategory);
       formData.append("price", values.price);
       formData.append("discountPercentage", values.discountPrice);
-
+      fileList.forEach((file) => {
+        formData.append("image", file.originFileObj);
+      });
       const res = await addProduct(formData);
       if (res?.data?.success) {
         message.success(res.data.message);
@@ -68,6 +87,17 @@ const ProductAddPage = () => {
     <div className="bg-white p-3">
       <Navigate title={"Add Product"} />
       <Form form={form} onFinish={handleSubmit} layout="vertical">
+        <Form.Item label="Photos Thumbnail">
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            onChange={onChange}
+            onPreview={onPreview}
+            multiple={true}
+          >
+            {fileList.length < 1 && "+ Upload"}
+          </Upload>
+        </Form.Item>
         {/* Main Product Info */}
         <div className="grid grid-cols-3 gap-4">
           <Form.Item

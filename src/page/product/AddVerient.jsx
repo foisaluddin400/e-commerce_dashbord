@@ -1,7 +1,12 @@
 import { Form, message, Select, Upload } from "antd";
 import React, { useState } from "react";
 import { Navigate } from "../../Navigate";
-import { useGetColorCatQuery, useGetColorQuery, useGetSizeCatQuery, useGetSizeQuery } from "../redux/api/categoryApi";
+import {
+  useGetColorCatQuery,
+  useGetColorQuery,
+  useGetSizeCatQuery,
+  useGetSizeQuery,
+} from "../redux/api/categoryApi";
 import { useCreateProductVeriantMutation } from "../redux/api/productApi";
 import { useParams } from "react-router-dom";
 
@@ -25,37 +30,51 @@ const onPreview = async (file) => {
 const AddVerient = () => {
   const { id } = useParams();
   const { data: colorData } = useGetColorCatQuery();
-  console.log(colorData)
+  console.log(colorData);
   const { data: sizeData } = useGetSizeCatQuery();
   const [addVerientProduct] = useCreateProductVeriantMutation();
 
   const [frontImageList, setFrontImageList] = useState([]);
   const [backImageList, setBackImageList] = useState([]);
+  const [rightImageList, setRightImageList] = useState([]);
+  const [leftImageList, setLeftImageList] = useState([]);
   const [form] = Form.useForm();
 
   const handleSubmit = async (values) => {
     try {
       const formData = new FormData();
 
-      // Images
-      frontImageList.forEach((file) => {
-        formData.append("frontImage", file.originFileObj);
-      });
-      backImageList.forEach((file) => {
-        formData.append("backImage", file.originFileObj);
-      });
+      // Required Images
+      frontImageList.forEach((file) =>
+        formData.append("frontImage", file.originFileObj)
+      );
+      backImageList.forEach((file) =>
+        formData.append("backImage", file.originFileObj)
+      );
+
+      // Optional Images
+      rightImageList.forEach((file) =>
+        formData.append("rightImage", file.originFileObj)
+      );
+      leftImageList.forEach((file) =>
+        formData.append("leftImage", file.originFileObj)
+      );
 
       // Other fields
-      formData.append("color", values.color); 
-      values.size.forEach((sizeId) => formData.append("size", sizeId)); 
+      formData.append("color", values.color);
+      values.size.forEach((sizeId) => formData.append("size", sizeId));
       formData.append("stockStatus", values.stockStatus);
       formData.append("status", values.status);
 
       const res = await addVerientProduct({ formData, id }).unwrap();
       message.success(res.message);
+
+      // Reset form and images
       form.resetFields();
       setFrontImageList([]);
       setBackImageList([]);
+      setRightImageList([]);
+      setLeftImageList([]);
     } catch (error) {
       console.error(error);
       message.error(error?.data?.message || "Something went wrong");
@@ -133,15 +152,17 @@ const AddVerient = () => {
             name="stockStatus"
             rules={[{ required: true, message: "Please select stock status" }]}
           >
-            <Select style={{ height: "45px" }} placeholder="Select Stock Status">
+            <Select
+              style={{ height: "45px" }}
+              placeholder="Select Stock Status"
+            >
               <Option value="In Stock">In Stock</Option>
               <Option value="Stock Out">Stock Out</Option>
-           
             </Select>
           </Form.Item>
 
           {/* Image Upload */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-4 gap-4">
             <Form.Item label="Front Image" name="frontImage">
               <Upload
                 listType="picture-card"
@@ -165,6 +186,32 @@ const AddVerient = () => {
                 accept="image/*"
               >
                 {backImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
+
+            <Form.Item label="Right Image (Optional)">
+              <Upload
+                listType="picture-card"
+                fileList={rightImageList}
+                onChange={({ fileList }) => setRightImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {rightImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
+
+            <Form.Item label="Left Image (Optional)">
+              <Upload
+                listType="picture-card"
+                fileList={leftImageList}
+                onChange={({ fileList }) => setLeftImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {leftImageList.length < 1 && "+ Upload"}
               </Upload>
             </Form.Item>
           </div>

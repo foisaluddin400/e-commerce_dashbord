@@ -39,6 +39,8 @@ const EditProduct = () => {
 
   const [frontImageList, setFrontImageList] = useState([]);
   const [backImageList, setBackImageList] = useState([]);
+    const [rightImageList, setRightImageList] = useState([]);
+  const [leftImageList, setLeftImageList] = useState([]);
   const [form] = Form.useForm();
 
   useEffect(() => {
@@ -79,6 +81,32 @@ const EditProduct = () => {
               ]
             : []
         );
+
+        setRightImageList(
+          variant.backImage
+            ? [
+                {
+                  uid: "-2",
+                  name: "rightImage",
+                  status: "done",
+                  url: `${imageUrl}${variant.rightImage}`,
+                },
+              ]
+            : []
+        );
+
+        setLeftImageList(
+          variant.backImage
+            ? [
+                {
+                  uid: "-2",
+                  name: "leftImage",
+                  status: "done",
+                  url: `${imageUrl}${variant.leftImage}`,
+                },
+              ]
+            : []
+        );
       }
     }
   }, [singleProduct, variantId, form]);
@@ -95,6 +123,18 @@ const EditProduct = () => {
         if (file.originFileObj) formData.append("backImage", file.originFileObj);
       });
 
+rightImageList.forEach((file) => {
+        if (file.originFileObj) formData.append("rightImage", file.originFileObj);
+      });
+
+
+      leftImageList.forEach((file) => {
+        if (file.originFileObj) formData.append("leftImage", file.originFileObj);
+      });
+
+
+
+    
       // Other fields
       formData.append("color", values.color);
       values.size.forEach((sizeId) => formData.append("size", sizeId));
@@ -190,33 +230,59 @@ const EditProduct = () => {
         </Form.Item>
 
         {/* Image Upload */}
-        <div className="grid grid-cols-2 gap-4">
-          <Form.Item label="Front Image" name="frontImage">
-            <Upload
-              listType="picture-card"
-              fileList={frontImageList}
-              onChange={({ fileList }) => setFrontImageList(fileList)}
-              onPreview={onPreview}
-              multiple={false}
-              accept="image/*"
-            >
-              {frontImageList.length < 1 && "+ Upload"}
-            </Upload>
-          </Form.Item>
+        <div className="grid grid-cols-4 gap-4">
+            <Form.Item label="Front Image" name="frontImage">
+              <Upload
+                listType="picture-card"
+                fileList={frontImageList}
+                onChange={({ fileList }) => setFrontImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {frontImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
 
-          <Form.Item label="Back Image" name="backImage">
-            <Upload
-              listType="picture-card"
-              fileList={backImageList}
-              onChange={({ fileList }) => setBackImageList(fileList)}
-              onPreview={onPreview}
-              multiple={false}
-              accept="image/*"
-            >
-              {backImageList.length < 1 && "+ Upload"}
-            </Upload>
-          </Form.Item>
-        </div>
+            <Form.Item label="Back Image" name="backImage">
+              <Upload
+                listType="picture-card"
+                fileList={backImageList}
+                onChange={({ fileList }) => setBackImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {backImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
+
+            <Form.Item label="Right Image (Optional)">
+              <Upload
+                listType="picture-card"
+                fileList={rightImageList}
+                onChange={({ fileList }) => setRightImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {rightImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
+
+            <Form.Item label="Left Image (Optional)">
+              <Upload
+                listType="picture-card"
+                fileList={leftImageList}
+                onChange={({ fileList }) => setLeftImageList(fileList)}
+                onPreview={onPreview}
+                multiple={false}
+                accept="image/*"
+              >
+                {leftImageList.length < 1 && "+ Upload"}
+              </Upload>
+            </Form.Item>
+          </div>
 
         {/* Submit */}
         <div className="flex gap-3 mt-4">

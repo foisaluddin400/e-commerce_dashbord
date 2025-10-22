@@ -34,7 +34,7 @@ const AddProduct = () => {
   const [deleteData] = useDeleteVariantProductMutation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const[updateStatus] = useUpdateProductVeriantMutation()
+  const [updateStatus] = useUpdateProductVeriantMutation();
 
   const [statusModal, setStatusModal] = useState({
     open: false,
@@ -70,71 +70,60 @@ const AddProduct = () => {
       size: variant?.size?.map((s) => s.name).join(", "),
       fontImage: `${imageUrl}/${variant?.frontImage}`,
       backImage: `${imageUrl}/${variant?.backImage}`,
+      rightImage: `${imageUrl}/${variant?.rightImage}`,
+      leftImage: `${imageUrl}/${variant?.leftImage}`,
       category: variantProduct?.data?.category?.name,
       subcategory: variantProduct?.data?.subcategory?.name,
-      color: variant?.color?.name,
+      color: variant?.color,
+      hexValue: variant?.color?.hexValue,
       status: variant?.status,
       stockStatus: variant?.stockStatus,
       stock: 10,
     })) || [];
   console.log(products);
 
+  // Handle status change (API integration)
+  const handleStatusUpdate = async (record) => {
+    try {
+      const newStatus = record.status === "Visible" ? "Hidden" : "Visible";
 
+      const formData = { status: newStatus };
 
+      const res = await updateStatus({
+        formData,
+        productId: record.productId,
+        variantId: record.id,
+      }).unwrap();
 
+      message.success(res?.message);
 
+      setStatusModal({ open: false, type: "", record: null });
+    } catch (err) {
+      message.error(err?.data?.message || "Failed to update status");
+    }
+  };
 
+  // Handle stock status update (API integration)
+  const handleStockUpdate = async () => {
+    try {
+      const formData = { stockStatus: stockModal.value };
 
-// Handle status change (API integration)
-const handleStatusUpdate = async (record) => {
-  try {
-    const newStatus = record.status === "Visible" ? "Hidden" : "Visible";
+      console.log(stockModal.record.id);
+      console.log(stockModal.record.productId);
 
-    const formData = { status: newStatus };
+      const res = await updateStatus({
+        formData,
+        productId: stockModal.record.productId,
+        variantId: stockModal.record.id,
+      }).unwrap();
 
-    const res = await updateStatus({
-      formData,
-      productId: record.productId,
-      variantId: record.id, 
-    }).unwrap();
+      message.success(res?.message);
 
-    message.success(res?.message);
-
-
-
-    setStatusModal({ open: false, type: "", record: null });
-  } catch (err) {
-    message.error(err?.data?.message || "Failed to update status");
-  }
-};
-
-// Handle stock status update (API integration)
-const handleStockUpdate = async () => {
-  try {
-    const formData = { stockStatus: stockModal.value };
-
-    console.log(stockModal.record.id)
-    console.log(stockModal.record.productId)
-
-    const res = await updateStatus({
-      formData,
-      productId: stockModal.record.productId,
-      variantId: stockModal.record.id, 
-    }).unwrap();
-
-    message.success(res?.message);
-
-
-
-    setStockModal({ open: false, record: null, value: "" });
-  } catch (err) {
-    message.error(err?.data?.message);
-  }
-};
-
-
-
- 
+      setStockModal({ open: false, record: null, value: "" });
+    } catch (err) {
+      message.error(err?.data?.message);
+    }
+  };
 
   const columns = [
     {
@@ -154,34 +143,65 @@ const handleStockUpdate = async () => {
       title: "Price",
       dataIndex: "price",
       key: "price",
-      render: (price) => <span className="text-green-600">৳{price}</span>,
+      render: (price) => <span className="text-green-600">${price}</span>,
     },
-    {
-      title: "Discount Price",
-      dataIndex: "discountPrice",
-      key: "discountPrice",
-      render: (price) => <span className="text-red-500">৳{price}</span>,
-    },
-    {
-      title: "Size",
-      dataIndex: "size",
-      key: "size",
-    },
+    // {
+    //   title: "Discount Price",
+    //   dataIndex: "discountPrice",
+    //   key: "discountPrice",
+    //   render: (price) => <span className="text-red-500">৳{price}</span>,
+    // },
+    // {
+    //   title: "Size",
+    //   dataIndex: "size",
+    //   key: "size",
+    // },
     {
       title: "Color",
       dataIndex: "color",
       key: "color",
+      render: (color) => (
+        <div className="flex gap-x-2.5">
+          <div className="mt-0">
+            <span
+              style={{
+                display: "inline-block",
+                width: "15px",
+                height: "15px",
+                backgroundColor: color.hexValue,
+                borderRadius: "50%",
+              }}
+            ></span>
+          </div>
+          <div className="-mt-1">{color.name}</div>
+        </div>
+      ),
     },
+
     {
       title: "Front Image",
       dataIndex: "fontImage",
       key: "fontImage",
       render: (img) => <Image width={45} src={img} />,
     },
+
     {
       title: "Back Image",
       dataIndex: "backImage",
       key: "backImage",
+      render: (img) => <Image width={45} src={img} />,
+    },
+
+    {
+      title: "Right Image",
+      dataIndex: "rightImage",
+      key: "rightImage",
+      render: (img) => <Image width={45} src={img} />,
+    },
+    {
+      title: "Left Image",
+      dataIndex: "leftImage",
+      key: "leftImage",
       render: (img) => <Image width={45} src={img} />,
     },
     {
@@ -340,18 +360,40 @@ const handleStockUpdate = async () => {
               <span className="font-semibold">Status:</span>{" "}
               {selectedProduct.status}
             </p>
-            <p>
+            <p className="flex gap-3">
               <span className="font-semibold">Color:</span>{" "}
-              {selectedProduct.color}
+              <div className="flex gap-x-2.5">
+                <div className="mt-0">
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "15px",
+                      height: "15px",
+                      backgroundColor: selectedProduct.color?.hexValue,
+                      borderRadius: "50%",
+                    }}
+                  ></span>
+                </div>
+                <div className="-mt-1">{selectedProduct.color?.name}</div>
+              </div>
             </p>
-            <div className="flex space-x-4 mt-3">
+            <div className="grid grid-cols-2 mt-3">
               <div>
                 <p className="font-semibold mb-1">Front Image</p>
-                <Image width={100} src={selectedProduct.fontImage} />
+                <Image className="w-full" src={selectedProduct.fontImage} />
               </div>
               <div>
                 <p className="font-semibold mb-1">Back Image</p>
-                <Image width={100} src={selectedProduct.backImage} />
+                <Image className="w-full" src={selectedProduct.backImage} />
+              </div>
+
+              <div>
+                <p className="font-semibold mb-1">Right Image</p>
+                <Image className="w-full" src={selectedProduct.rightImage} />
+              </div>
+              <div>
+                <p className="font-semibold mb-1">Left Image</p>
+                <Image className="w-full" src={selectedProduct.leftImage} />
               </div>
             </div>
           </div>
@@ -385,7 +427,6 @@ const handleStockUpdate = async () => {
         >
           <Option value="In Stock">In Stock</Option>
           <Option value="Stock Out">Stock Out</Option>
-        
         </Select>
       </Modal>
     </div>

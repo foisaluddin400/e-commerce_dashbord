@@ -34,6 +34,7 @@ import MainProduct from "../page/product/MainProduct";
 import AddVerient from "../page/product/AddVerient";
 import EditProductInfo from "../page/product/EditProductInfo";
 import Brands from "../page/brands/Brands";
+import CustomizeIcon from "../page/customize/CustomizeIcon";
 
 
 export const router = createBrowserRouter([
@@ -116,6 +117,10 @@ export const router = createBrowserRouter([
       {
         path: "/dashboard/size",
         element:<SizePage></SizePage>
+      },
+      {
+        path: "/dashboard/CustomizedIcon",
+        element:<CustomizeIcon></CustomizeIcon>
       },
         {
         path: "/dashboard/blogs",

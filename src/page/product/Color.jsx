@@ -1,22 +1,31 @@
 import React, { useState } from "react";
 import { Table, Button, Space, message, Input, Pagination } from "antd";
-import { EditOutlined, DeleteOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
 import { Navigate } from "../../Navigate";
 import AddColor from "./AddColor";
-import { useDeleteColorMutation, useGetColorQuery } from "../redux/api/categoryApi";
+import {
+  useDeleteColorMutation,
+  useGetColorQuery,
+} from "../redux/api/categoryApi";
 import EditColor from "./EditColor";
 
 const Color = () => {
-    const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { data: colorsData } = useGetColorQuery({    search,
+  const { data: colorsData } = useGetColorQuery({
+    search,
     page: currentPage,
-    limit: pageSize,});
+    limit: pageSize,
+  });
   const [openAddModal, setOpenAddModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-   const [editModal, setEditModal] = useState(false);
-   const[deleteData] = useDeleteColorMutation()
+  const [editModal, setEditModal] = useState(false);
+  const [deleteData] = useDeleteColorMutation();
   // Convert API data to table format
   const colors =
     colorsData?.data?.map((item) => ({
@@ -28,9 +37,8 @@ const Color = () => {
     setSelectedCategory(record);
     setEditModal(true);
   };
-  const handleDelete = async(id) => {
-  
-        try {
+  const handleDelete = async (id) => {
+    try {
       const res = await deleteData(id).unwrap();
       message.success(res?.message);
     } catch (err) {
@@ -97,7 +105,7 @@ const Color = () => {
         <Navigate title={"Color"} />
         <div className="flex gap-5">
           <Input
-           onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
@@ -131,12 +139,12 @@ const Color = () => {
         />
       </div>
 
-      <AddColor
-        setOpenAddModal={setOpenAddModal}
-        openAddModal={openAddModal}
-        
-      />
-      <EditColor editModal={editModal} setEditModal={setEditModal} selectedCategory={selectedCategory}></EditColor>
+      <AddColor setOpenAddModal={setOpenAddModal} openAddModal={openAddModal} />
+      <EditColor
+        editModal={editModal}
+        setEditModal={setEditModal}
+        selectedCategory={selectedCategory}
+      ></EditColor>
     </div>
   );
 };

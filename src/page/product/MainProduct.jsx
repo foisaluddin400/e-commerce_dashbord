@@ -1,15 +1,19 @@
-import { Table, Input, Space, message } from "antd";
+import { Table, Input, Space, message, Image } from "antd";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { MdModeEditOutline } from "react-icons/md";
 import { LuEye } from "react-icons/lu";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Navigate } from "../../Navigate";
-import { useDeleteProductMutation, useGetProductQuery } from "../redux/api/productApi";
+import {
+  useDeleteProductMutation,
+  useGetProductQuery,
+} from "../redux/api/productApi";
+import { imageUrl } from "../redux/api/baseApi";
 
 const MainProduct = () => {
   const { data: allProduct } = useGetProductQuery();
-  const [deleteData] = useDeleteProductMutation()
+  const [deleteData] = useDeleteProductMutation();
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   const navigate = useNavigate();
@@ -30,22 +34,29 @@ const MainProduct = () => {
       sl: index + 1,
       name: item.productName,
       category: item.category?.name,
-       brand: item.brand?.brandName,
+      brand: item.brand?.brandName,
       subcategory: item.subcategory?.name,
       price: item.price,
+      thumbnail: `${imageUrl}/${item.thumbnail}`,
       discountPrice: item.discountPercentage,
       variant: item.variants?.length || 0,
     })) || [];
-    console.log(allProduct)
+  console.log(allProduct);
 
   const columns = [
     { title: "SL no.", dataIndex: "sl", width: 70, align: "center" },
     { title: "Product Name", dataIndex: "name" },
+     {
+      title: "Thumbnail",
+      dataIndex: "thumbnail",
+      key: "thumbnail",
+      render: (img) => <Image width={45} src={img} />,
+    },
     { title: "Brand", dataIndex: "brand" },
     { title: "Category", dataIndex: "category" },
     { title: "Subcategory", dataIndex: "subcategory" },
     { title: "Price", dataIndex: "price" },
-    { title: "Discount Percentage", dataIndex: "discountPrice" },
+    { title: "Discount %", dataIndex: "discountPrice" },
     { title: "Total Variant", dataIndex: "variant" },
     {
       title: "Action",
@@ -80,7 +91,7 @@ const MainProduct = () => {
   return (
     <div className="bg-white p-3 h-[87vh]">
       <div className="flex justify-between mb-4">
-        <Navigate title={"Products Verients"} />
+        <Navigate title={"Products Info"} />
         <div className="flex gap-5">
           <Input
             placeholder="Search by name..."
