@@ -81,8 +81,8 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
       width={600}
       destroyOnClose // ✅ clears content when modal closes
     >
-      <div className="mb-20 mt-4">
-        <div className="font-bold text-center mb-11">Edit Category</div>
+      <div className="">
+        <div className="font-bold text-center mb-6">Edit Category</div>
         <Form
           form={form}
           layout="vertical"
@@ -110,13 +110,24 @@ const EditCategories = ({ editModal, setEditModal, selectedCategory }) => {
           </Form.Item>
 
           <Form.Item>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 mt-2 bg-[#E63946] text-white rounded-md"
-            >
-              {loading ? <Spin size="small" /> : "Update"}
-            </button>
+              <button
+                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                      loading
+                        ? "bg-[#fa8e97] cursor-not-allowed"
+                        : "bg-[#E63946] hover:bg-[#941822]"
+                    }`}
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spin size="small" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </button>
           </Form.Item>
         </Form>
       </div>

@@ -9,8 +9,6 @@ const EditSubCategories = ({
   selectedCategory,
 }) => {
   console.log("Selected Subcategory:", selectedCategory);
-
-
   // const [updateSub] = useUpdateSubCategoryMutation();
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
@@ -95,8 +93,8 @@ const [editSub] = useUpdatesubCategoryMutation()
       footer={null}
       width={600}
     >
-      <div className="mb-11 mt-4">
-        <div className="font-bold text-center mb-11">Edit Subcategory</div>
+      <div className="">
+        <div className="font-bold text-center mb-6">Edit Subcategory</div>
         <Form
           form={form}
           layout="vertical"
@@ -135,13 +133,24 @@ const [editSub] = useUpdatesubCategoryMutation()
           </Form.Item>
 
           <Form.Item>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2 mt-2 bg-[#E63946] text-white rounded-md"
-            >
-              {loading ? <Spin size="small" /> : "Update"}
-            </button>
+               <button
+                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                      loading
+                        ? "bg-[#fa8e97] cursor-not-allowed"
+                        : "bg-[#E63946] hover:bg-[#941822]"
+                    }`}
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spin size="small" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </button>
           </Form.Item>
         </Form>
       </div>

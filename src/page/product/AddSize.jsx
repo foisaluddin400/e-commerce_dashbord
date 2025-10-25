@@ -65,13 +65,7 @@ const AddSize = ({ openAddModal, setOpenAddModal }) => {
                 "Submit"
               )}
             </button>
-            <button
-              type="button"
-              className="px-4 py-3 w-full bg-[#D9000A] text-white rounded-md"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
+           
           </div>
         </Form>
       </div>

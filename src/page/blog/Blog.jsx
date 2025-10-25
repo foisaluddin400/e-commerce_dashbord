@@ -20,12 +20,14 @@ import { EyeIcon } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Blog = () => {
-    const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const { data: blogData, refetch } = useGetBlogsQuery({    search,
+  const { data: blogData, refetch } = useGetBlogsQuery({
+    search,
     page: currentPage,
-    limit: pageSize,});
+    limit: pageSize,
+  });
   const [addBlogs] = useAddBlogsMutation();
   const [updateBlogs] = useUpdateBlogsMutation();
   const [deleteBlogs] = useDeleteBlogsMutation();
@@ -96,7 +98,6 @@ const Blog = () => {
     try {
       const formData = new FormData();
 
-      
       if (fileList[0]?.originFileObj) {
         formData.append("image", fileList[0].originFileObj);
       }
@@ -129,7 +130,7 @@ const Blog = () => {
         <Navigate title="Blog" />
         <div className="flex gap-5">
           <Input
-           onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
@@ -186,14 +187,14 @@ const Blog = () => {
                   <DeleteOutlined />
                 </button>
               </div>
-             <Link to={`/dashboard/blog-details/${blog?._id}`}> <div
-               
-                className="bg-sky-500 cursor-pointer text-white py-1 px-3 rounded"
-              >
-                <button>
-                  <EyeIcon></EyeIcon>
-                </button>
-              </div></Link>
+              <Link to={`/dashboard/blog-details/${blog?._id}`}>
+                {" "}
+                <div className="bg-sky-500 cursor-pointer text-white py-1 px-3 rounded">
+                  <button>
+                    <EyeIcon></EyeIcon>
+                  </button>
+                </div>
+              </Link>
             </div>
           </div>
         ))}
@@ -240,11 +241,22 @@ const Blog = () => {
             <JoditEditor value={content} onBlur={setContent} />
           </Form.Item>
           <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#fa8e97] cursor-not-allowed"
+                : "bg-[#E63946] hover:bg-[#941822]"
+            }`}
             type="submit"
             disabled={loading}
-            className="w-full py-2 mt-2 bg-[#E63946] text-white rounded-md"
           >
-            {loading ? <Spin size="small" /> : "Add"}
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </Form>
       </Modal>
@@ -280,11 +292,22 @@ const Blog = () => {
             <JoditEditor value={content} onBlur={setContent} />
           </Form.Item>
           <button
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+              loading
+                ? "bg-[#fa8e97] cursor-not-allowed"
+                : "bg-[#E63946] hover:bg-[#941822]"
+            }`}
             type="submit"
             disabled={loading}
-            className="w-full py-2 mt-2 bg-[#E63946] text-white rounded-md"
           >
-            {loading ? <Spin size="small" /> : "Update"}
+            {loading ? (
+              <>
+                <Spin size="small" />
+                <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </Form>
       </Modal>

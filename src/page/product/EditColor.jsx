@@ -134,13 +134,7 @@ const EditColor = ({ editModal, setEditModal, selectedCategory }) => {
                 "Submit"
               )}
             </button>
-            <button
-              type="button"
-              className="px-4 py-3 w-full bg-[#D9000A] text-white rounded-md"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
+          
           </div>
         </Form>
       </div>

@@ -67,9 +67,9 @@ const AddCategories = ({ openAddModal, setOpenAddModal }) => {
       footer={null}
       width={600}
     >
-      <div className="mb-20 mt-4">
+      <div className="">
         <div>
-          <div className="font-bold text-center mb-11">+ Add Category</div>
+          <div className="font-bold text-center mb-6">+ Add Category</div>
 
           <Form
             form={form}
@@ -103,12 +103,23 @@ const AddCategories = ({ openAddModal, setOpenAddModal }) => {
             {/* Save Button */}
             <Form.Item>
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-2 mt-2 bg-[#E63946] text-white rounded-md"
-              >
-                {loading ? <Spin size="small" /> : "Add"}
-              </button>
+                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                      loading
+                        ? "bg-[#fa8e97] cursor-not-allowed"
+                        : "bg-[#E63946] hover:bg-[#941822]"
+                    }`}
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spin size="small" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </button>
             </Form.Item>
           </Form>
         </div>

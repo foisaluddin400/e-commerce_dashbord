@@ -1,4 +1,4 @@
-import { Form, Input, Modal, message } from "antd";
+import { Form, Input, Modal, Spin, message } from "antd";
 import React, { useState } from "react";
 import { useAddColorMutation } from "../redux/api/categoryApi";
 
@@ -6,7 +6,7 @@ const AddColor = ({ openAddModal, setOpenAddModal }) => {
   const [form] = Form.useForm();
   const [colorHex, setColorHex] = useState("#000000");
   const [addColor] = useAddColorMutation();
-
+  const [loading, setLoading] = useState(false);
   const handleCancel = () => {
     form.resetFields();
     setColorHex("#000000");
@@ -14,6 +14,7 @@ const AddColor = ({ openAddModal, setOpenAddModal }) => {
   };
 
   const handleSubmit = async (values) => {
+    setLoading(true);
     try {
       const payload = {
         name: values.colorName,
@@ -24,9 +25,11 @@ const AddColor = ({ openAddModal, setOpenAddModal }) => {
       console.log("API Response:", res);
 
       message.success("Color added successfully!");
+      setLoading(false);
       handleCancel();
     } catch (err) {
       console.error(err);
+      setLoading(false);
       message.error("Failed to add color");
     }
   };
@@ -98,19 +101,25 @@ const AddColor = ({ openAddModal, setOpenAddModal }) => {
 
           {/* Buttons */}
           <div className="flex gap-3 mt-4">
-            <button
-              type="submit"
-              className="px-4 py-3 w-full bg-[#D17C51] text-white rounded-md"
-            >
-              Add
-            </button>
-            <button
-              type="button"
-              className="px-4 py-3 w-full bg-[#D9000A] text-white rounded-md"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
+               <button
+                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                      loading
+                        ? "bg-[#fa8e97] cursor-not-allowed"
+                        : "bg-[#E63946] hover:bg-[#941822]"
+                    }`}
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>
+                        <Spin size="small" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      "Submit"
+                    )}
+                  </button>
+           
           </div>
         </Form>
       </div>
