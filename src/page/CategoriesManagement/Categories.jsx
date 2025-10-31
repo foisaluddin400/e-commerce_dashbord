@@ -19,6 +19,7 @@ const Categories = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+  const handlePageChange = (page) => setCurrentPage(page);
   const { data: categorys, isLoading } = useGetAllCategoryQuery({
     search,
     page: currentPage,
@@ -27,7 +28,7 @@ const Categories = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const handlePageChange = (page) => setCurrentPage(page);
+  
   const navigate = useNavigate();
   const handleDeleteCategory = async (id) => {
     console.log(id);

@@ -84,6 +84,34 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+
+
+
+    getOrder: builder.query({
+      query: () => {
+        return {
+          url: `/orders`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+
+  updateOrder: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/orders/${id}/status`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+
+
+
     //     getUserAll: builder.query({
     //       query: ({ page, limit }) => {
     //         return {
@@ -237,5 +265,7 @@ export const {
   useUpdateContactMutation,
   useGetContactQuery,
   useGetClientContactQuery,
-  useDeleteContactClientsMutation
+  useDeleteContactClientsMutation,
+  useGetOrderQuery,
+  useUpdateOrderMutation
 } = meta;
