@@ -5,7 +5,7 @@ const CreatorManagement = () => {
   
   return (
     <div>
-      categorymanegment
+      categorymanegmentd
     </div>
   );
 };
