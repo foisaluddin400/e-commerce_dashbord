@@ -35,6 +35,7 @@ import AddVerient from "../page/product/AddVerient";
 import EditProductInfo from "../page/product/EditProductInfo";
 import Brands from "../page/brands/Brands";
 import CustomizeIcon from "../page/customize/CustomizeIcon";
+import CouponCode from "../page/coupon/CouponCode";
 
 
 export const router = createBrowserRouter([
@@ -81,6 +82,10 @@ export const router = createBrowserRouter([
        {
         path: "/dashboard/banner",
         element: <Banner></Banner>
+      },
+       {
+        path: "/dashboard/coupons",
+        element: <CouponCode></CouponCode>
       },
        {
         path: "/dashboard/product",
