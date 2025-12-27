@@ -1,62 +1,78 @@
-import { Form, Input, message, Modal, Spin, Upload, Select, DatePicker } from "antd";
+import {
+  Form,
+  Input,
+  message,
+  Modal,
+  Spin,
+  Upload,
+  Select,
+  DatePicker,
+} from "antd";
 import React, { useState } from "react";
 import { UploadOutlined } from "@ant-design/icons";
+import { useAddCouponMutation } from "../redux/api/couponApi";
+import { useGetCategoryQuery } from "../redux/api/categoryApi";
+import dayjs from "dayjs";
 
 const { Option } = Select;
 
-const onPreview = async (file) => {
-  let src = file.url;
-  if (!src) {
-    src = await new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file.originFileObj);
-      reader.onload = () => resolve(reader.result);
-    });
-  }
-  const image = new Image();
-  image.src = src;
-  const imgWindow = window.open(src);
-  if (imgWindow) {
-    imgWindow.document.write(image.outerHTML);
-  }
-};
-
 const AddCoupon = ({ openAddModal, setOpenAddModal }) => {
   const [form] = Form.useForm();
+  const [addCoupon] = useAddCouponMutation();
   const [fileList, setFileList] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [quantityType, setQuantityType] = useState("unlimited"); // unlimited or limited
-  const [discountType, setDiscountType] = useState("percentage"); // percentage or flat
+  const [quantityType, setQuantityType] = useState("unlimited");
+  const [discountType, setDiscountType] = useState("PERCENTAGE");
 
-  const onChange = ({ fileList: newFileList }) => {
-    setFileList(newFileList.slice(-1)); // Only allow 1 image
-  };
+  const { data: categoryData } = useGetCategoryQuery({ limit: 10, page: 1 });
 
   const handleCancel = () => {
     form.resetFields();
     setFileList([]);
     setQuantityType("unlimited");
-    setDiscountType("percentage");
+    setDiscountType("PERCENTAGE");
     setOpenAddModal(false);
   };
 
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      const formData = {
-        ...values,
-        image: fileList[0]?.originFileObj || null,
-        quantityType,
-        discountType,
-        startDate: values.startDate?.format("YYYY-MM-DD"),
-        endDate: values.endDate?.format("YYYY-MM-DD"),
-      };
+      const formData = new FormData();
 
-      console.log("Submitted Coupon Data:", formData);
-      message.success("Coupon added successfully!");
-      handleCancel();
+      formData.append("name", values.reasonName);
+      formData.append("code", values.couponCode);
+      formData.append("discountType", discountType);
+      formData.append("discountValue", values.discountValue);
+      formData.append("category", values.category);
+
+      formData.append(
+        "startDate",
+        dayjs(values.startDate).format("YYYY-MM-DD")
+      );
+      formData.append(
+        "endDate",
+        dayjs(values.endDate).format("YYYY-MM-DD")
+      );
+
+      // ✅ only send if limited
+      if (quantityType === "limited") {
+        formData.append("usageLimit", values.usageLimit);
+      }
+
+      if (fileList.length > 0) {
+        formData.append("image", fileList[0].originFileObj);
+      }
+
+      const res = await addCoupon(formData);
+
+      if (res?.data?.success) {
+        message.success(res.data.message);
+        handleCancel();
+      } else {
+        message.error("Something went wrong");
+      }
     } catch (error) {
-      message.error("Failed to add coupon.");
+      message.error("Failed to add coupon");
     } finally {
       setLoading(false);
     }
@@ -77,153 +93,118 @@ const AddCoupon = ({ openAddModal, setOpenAddModal }) => {
         onFinish={handleSubmit}
         className="px-4"
       >
-        {/* Image Upload */}
+        {/* Image */}
         <Form.Item
           label="Coupon Image"
-          name="image"
-          rules={[{ required: true, message: "Please upload a coupon image!" }]}
+          required
         >
           <Upload
             listType="picture-card"
             fileList={fileList}
-            onChange={onChange}
-            onPreview={onPreview}
-            beforeUpload={() => false} // Prevent auto upload
+            onChange={({ fileList }) => setFileList(fileList.slice(-1))}
+            beforeUpload={() => false}
             maxCount={1}
           >
             {fileList.length < 1 && (
               <div>
                 <UploadOutlined />
-                <div className="mt-2">Upload Image</div>
+                <div>Upload</div>
               </div>
             )}
           </Upload>
-        </Form.Item>
-
-        {/* Coupon Reason Name */}
-        <Form.Item
-          label="Coupon Reason Name"
-          name="reasonName"
-          rules={[{ required: true, message: "Please enter coupon reason name!" }]}
-        >
-          <Input placeholder="e.g. Christmas Sale, Black Friday" style={{ height: "40px" }} />
         </Form.Item>
 
         {/* Coupon Code */}
         <Form.Item
           label="Coupon Code"
           name="couponCode"
-          rules={[{ required: true, message: "Please enter coupon code!" }]}
+          rules={[{ required: true }]}
         >
-          <Input placeholder="e.g. SAVE20, FREESHIP" style={{ height: "40px" }} />
+          <Input />
+        </Form.Item>
+
+        {/* Reason */}
+        <Form.Item
+          label="Coupon Reason"
+          name="reasonName"
+          rules={[{ required: true }]}
+        >
+          <Input />
         </Form.Item>
 
         {/* Category */}
         <Form.Item
           label="Category"
           name="category"
-          rules={[{ required: true, message: "Please select a category!" }]}
+          rules={[{ required: true }]}
         >
-          <Select placeholder="Select category" style={{ height: "40px" }}>
-            <Option value="electronics">Electronics</Option>
-            <Option value="fashion">Fashion</Option>
-            <Option value="home">Home & Living</Option>
-            <Option value="beauty">Beauty</Option>
-            <Option value="food">Food & Grocery</Option>
-            <Option value="other">Other</Option>
+          <Select placeholder="Select category">
+            {categoryData?.data?.map((cat) => (
+              <Option key={cat._id} value={cat._id}>
+                {cat.name}
+              </Option>
+            ))}
           </Select>
         </Form.Item>
 
         {/* Quantity Type */}
-        <Form.Item label="Quantity Type" required>
-          <Select
-            value={quantityType}
-            onChange={setQuantityType}
-            style={{ height: "40px" }}
-          >
+        <Form.Item label="Quantity Type">
+          <Select value={quantityType} onChange={setQuantityType}>
             <Option value="unlimited">Unlimited</Option>
             <Option value="limited">Limited</Option>
           </Select>
         </Form.Item>
 
-        {/* Conditional Quantity Input */}
+        {/* Usage Limit */}
         {quantityType === "limited" && (
           <Form.Item
-            label="Quantity Limit"
-            name="quantity"
-            rules={[{ required: true, message: "Please enter quantity limit!" }]}
+            label="Usage Limit"
+            name="usageLimit"
+            rules={[{ required: true }]}
           >
-            <Input type="number" placeholder="e.g. 100" style={{ height: "40px" }} min={1} />
+            <Input type="number" min={1} />
           </Form.Item>
         )}
 
-        {/* Start & End Date */}
+        {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
-          <Form.Item
-            label="Start Date"
-            name="startDate"
-            rules={[{ required: true, message: "Please select start date!" }]}
-          >
-            <DatePicker style={{ width: "100%", height: "40px" }} format="YYYY-MM-DD" />
+          <Form.Item name="startDate" label="Start Date" rules={[{ required: true }]}>
+            <DatePicker className="w-full" />
           </Form.Item>
 
-          <Form.Item
-            label="End Date"
-            name="endDate"
-            rules={[{ required: true, message: "Please select end date!" }]}
-          >
-            <DatePicker style={{ width: "100%", height: "40px" }} format="YYYY-MM-DD" />
+          <Form.Item name="endDate" label="End Date" rules={[{ required: true }]}>
+            <DatePicker className="w-full" />
           </Form.Item>
         </div>
 
         {/* Discount Type */}
-        <Form.Item label="Discount Type" required>
-          <Select
-            value={discountType}
-            onChange={setDiscountType}
-            style={{ height: "40px" }}
-          >
-            <Option value="percentage">Percentage (%)</Option>
-            <Option value="flat">Flat Amount ($)</Option>
+        <Form.Item label="Discount Type">
+          <Select value={discountType} onChange={setDiscountType}>
+            <Option value="PERCENTAGE">Percentage (%)</Option>
+            <Option value="FIXED_AMOUNT">Fixed Amount</Option>
           </Select>
         </Form.Item>
 
         {/* Discount Value */}
         <Form.Item
-          label={`Discount Value (${discountType === "percentage" ? "%" : "$"})`}
+          label="Discount Value"
           name="discountValue"
-          rules={[{ required: true, message: "Please enter discount value!" }]}
+          rules={[{ required: true }]}
         >
           <Input
             type="number"
-            placeholder={discountType === "percentage" ? "e.g. 20" : "e.g. 10"}
-            style={{ height: "40px" }}
-            min={0}
-            addonAfter={discountType === "percentage" ? "%" : "$"}
+            addonAfter={discountType === "PERCENTAGE" ? "%" : "$"}
           />
         </Form.Item>
 
-        {/* Submit Button */}
-        <Form.Item>
-          <button
-            type="submit"
-            disabled={loading}
-            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
-              loading
-                ? "bg-[#fa8e97] cursor-not-allowed"
-                : "bg-[#E63946] hover:bg-[#c1121f]"
-            }`}
-          >
-            {loading ? (
-              <>
-                <Spin size="small" />
-                <span>Submitting...</span>
-              </>
-            ) : (
-              "Add Coupon"
-            )}
-          </button>
-        </Form.Item>
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-red-500 text-white py-3 rounded"
+        >
+          {loading ? <Spin /> : "Add Coupon"}
+        </button>
       </Form>
     </Modal>
   );

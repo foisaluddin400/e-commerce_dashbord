@@ -1,164 +1,243 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import {
+  Table,
+  Modal,
+  Form,
+  Input,
+  Upload,
+  Spin,
+  Pagination,
+  message,
+} from "antd";
+import { MdOutlineModeEdit } from "react-icons/md";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { UploadOutlined } from "@ant-design/icons";
+import {
+  useAddBannerMutation,
+  useDeleteBannerMutation,
+  useGetbannerQuery,
+  useUpdateBannerMutation,
+} from "../redux/api/metaApi";
+import { Navigate } from "../../Navigate";
+import { imageUrl } from "../redux/api/baseApi";
+
+
+
 const Banner = () => {
-      const [selectedFiles, setSelectedFiles] = useState([]);
-  const [category, setCategory] = useState("");
-  const [subCategory, setSubCategory] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef(null);
+  const [form] = Form.useForm();
+  const [openModal, setOpenModal] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [fileList, setFileList] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    setIsDragOver(true);
+  const pageSize = 10;
+
+  const { data: bannerData, isLoading } = useGetbannerQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
+
+  const [addBanner] = useAddBannerMutation();
+  const [updateBanner] = useUpdateBannerMutation();
+  const [deleteBanner] = useDeleteBannerMutation();
+
+  // ---------------- handlers ----------------
+
+  const handleOpenAdd = () => {
+    form.resetFields();
+    setFileList([]);
+    setEditData(null);
+    setOpenModal(true);
   };
 
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
+  const handleEdit = (record) => {
+    setEditData(record);
+    form.setFieldsValue({
+      title: record.title,
+      description: record.description,
+    });
+    setFileList([
+      {
+        uid: "-1",
+        name: "image",
+        status: "done",
+        url: imageUrl + record.image,
+      },
+    ]);
+    setOpenModal(true);
   };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    const files = Array.from(e.dataTransfer.files);
-    setSelectedFiles(files);
-  };
-
-  const handleFileSelect = (e) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setSelectedFiles(files);
+  const handleDelete = async (id) => {
+    try {
+      await deleteBanner(id).unwrap();
+      message.success("Banner deleted successfully");
+    } catch {
+      message.error("Failed to delete banner");
     }
   };
 
-  const handleBrowseClick = () => {
-    fileInputRef.current?.click();
+  const handleSubmit = async (values) => {
+    try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+
+      if (fileList[0]?.originFileObj) {
+        formData.append("image", fileList[0].originFileObj);
+      }
+
+      if (editData) {
+        await updateBanner({ id: editData._id, data: formData }).unwrap();
+        message.success("Banner updated successfully");
+      } else {
+        await addBanner(formData).unwrap();
+        message.success("Banner added successfully");
+      }
+
+      setOpenModal(false);
+      setEditData(null);
+      form.resetFields();
+      setFileList([]);
+    } catch {
+      message.error("Operation failed");
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", {
-      category,
-      subCategory,
-      discount,
-      files: selectedFiles,
-    });
-  };
+  // ---------------- table columns ----------------
+
+  const columns = [
+    {
+      title: "SL",
+      render: (_, __, index) =>
+        (currentPage - 1) * pageSize + index + 1,
+    },
+    {
+      title: "Image",
+      dataIndex: "image",
+      align: "center",
+      render: (img) => (
+        <img
+          src={imageUrl + img}
+          className="w-16 h-12 object-cover rounded mx-auto"
+        />
+      ),
+    },
+    {
+      title: "Title",
+      dataIndex: "title",
+      align: "center",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      align: "center",
+      ellipsis: true,
+    },
+    {
+      title: "Actions",
+      align: "center",
+      render: (_, record) => (
+        <div className="flex gap-3 justify-center">
+          <div
+            onClick={() => handleEdit(record)}
+            className="w-9 h-9 bg-blue-500 text-white flex items-center justify-center rounded cursor-pointer"
+          >
+            <MdOutlineModeEdit />
+          </div>
+          <div
+            onClick={() => handleDelete(record._id)}
+            className="w-9 h-9 bg-red-500 text-white flex items-center justify-center rounded cursor-pointer"
+          >
+            <RiDeleteBin6Line />
+          </div>
+        </div>
+      ),
+    },
+  ];
+
+  // ---------------- UI ----------------
 
   return (
-    <div>
-        <div className="p-6 ">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Form Fields */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded"
-          >
-            <option value="">Select Category</option>
-            <option value="graphics">Graphics & Design</option>
-            <option value="marketing">Marketing Materials</option>
-            <option value="print">Print Design</option>
-            <option value="digital">Digital Assets</option>
-          </select>
-
-          <select
-            value={subCategory}
-            onChange={(e) => setSubCategory(e.target.value)}
-            className="p-2 border border-gray-300 rounded"
-          >
-            <option value="">Select Sub Category</option>
-            <option value="logo">Logo Design</option>
-            <option value="brochure">Brochure</option>
-            <option value="business-card">Business Card</option>
-            <option value="flyer">Flyer</option>
-          </select>
-
-          <input
-            type="text"
-            placeholder="Discount"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            className="p-2 border border-gray-300 rounded"
-          />
-        </div>
-
-        {/* File Upload Area */}
-        <div
-          className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-            isDragOver ? "border-red-400 bg-red-50" : "border-gray-300 bg-gray-50"
-          }`}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          <div className="flex flex-col items-center space-y-4">
-            <div
-              className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center"
-              style={{ fontSize: "2rem" }}
-            >
-              ☁️
-            </div>
-
-            <div>
-              <p>
-                Drag & Drop or{" "}
-                <button
-                  type="button"
-                  onClick={handleBrowseClick}
-                  className="text-red-500 underline"
-                >
-                  Browse
-                </button>{" "}
-                Your Computer
-              </p>
-              <p className="text-sm text-gray-500 mt-2">
-                JPG, PNG, EPS, AI, PDF, WEBP, AVIF, HEIC, TIFF AND SVG (Max 20 MB)
-              </p>
-            </div>
-
-            {selectedFiles.length > 0 && (
-              <div className="mt-4">
-                <p className="text-sm font-medium">Selected files:</p>
-                {selectedFiles.map((file, index) => (
-                  <p key={index} className="text-sm text-gray-600">
-                    {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                  </p>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept=".jpg,.jpeg,.png,.eps,.ai,.pdf,.webp,.avif,.heic,.tiff,.svg"
-            onChange={handleFileSelect}
-            className="hidden"
-          />
-        </div>
-
-        {/* Help Section */}
-        <div className="text-center space-y-2">
-          <h3 className="font-medium">Need help with your upload?</h3>
-          <p className="text-sm text-gray-600">
-            We accept most file types. If yours isn't supported, just email it or start a chat. Our team will review your file and follow up with you.
-          </p>
-        </div>
-
-        {/* Submit Button */}
+    <div className="bg-white p-4 rounded shadow">
+      <div className="flex justify-between mb-4">
+        <Navigate title="Banner" />
         <button
-          type="submit"
-          className="px-6 bg-red-500 hover:bg-red-600 text-white py-3 rounded font-medium"
+          onClick={handleOpenAdd}
+          className="bg-[#E63946] text-white px-5 py-2 rounded"
         >
-          Submit
+          Add Banner
         </button>
-      </form>
-    </div>
-    </div>
-  )
-}
+      </div>
 
-export default Banner
+      <Table
+        dataSource={bannerData?.data || []}
+        columns={columns}
+        rowKey="_id"
+        loading={isLoading}
+        pagination={false}
+      />
+
+      <div className="mt-5 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={bannerData?.meta?.total || 0}
+          onChange={setCurrentPage}
+        />
+      </div>
+
+      {/* ADD / EDIT MODAL */}
+      <Modal
+        centered
+        open={openModal}
+        onCancel={() => setOpenModal(false)}
+        footer={null}
+        width={600}
+      >
+        <div className="font-bold text-center mb-5">
+          {editData ? "Update Banner" : "Add Banner"}
+        </div>
+
+        <Form form={form} layout="vertical" onFinish={handleSubmit}>
+          <Form.Item
+            label="Title"
+            name="title"
+            rules={[{ required: true }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            label="Description"
+            name="description"
+            rules={[{ required: true }]}
+          >
+            <Input.TextArea rows={4} />
+          </Form.Item>
+
+          <Form.Item label="Image">
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              onChange={({ fileList }) =>
+                setFileList(fileList.slice(-1))
+              }
+              beforeUpload={() => false}
+            >
+              {fileList.length < 1 && <UploadOutlined />}
+            </Upload>
+          </Form.Item>
+
+          <button
+            type="submit"
+            className="w-full bg-[#E63946] text-white py-3 rounded"
+          >
+            {editData ? "Update" : "Submit"}
+          </button>
+        </Form>
+      </Modal>
+    </div>
+  );
+};
+
+export default Banner;

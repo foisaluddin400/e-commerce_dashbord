@@ -43,6 +43,54 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+
+
+ getbanner: builder.query({
+      query: ({page, limit}) => {
+        return {
+          url: `/banners?page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+    addBanner: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/banners",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    deleteBanner: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/banners/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    updateBanner: builder.mutation({
+      query: ({ data, id }) => {
+        return {
+          url: `/banners/${id}`,
+          method: "PATCH",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+
+
+
+
+
     getContact: builder.query({
       query: () => {
         return {
@@ -267,5 +315,7 @@ export const {
   useGetClientContactQuery,
   useDeleteContactClientsMutation,
   useGetOrderQuery,
-  useUpdateOrderMutation
+  useUpdateOrderMutation,
+  useAddBannerMutation,
+  useDeleteBannerMutation,useGetbannerQuery,useUpdateBannerMutation
 } = meta;

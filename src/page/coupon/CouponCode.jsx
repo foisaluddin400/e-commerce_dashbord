@@ -1,161 +1,105 @@
-import { Input, Table, message } from "antd";
+import { Table, message, Pagination } from "antd";
 import { useState } from "react";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import AddCoupon from "./AddCoupon";
 import { MdOutlineModeEdit } from "react-icons/md";
+import AddCoupon from "./AddCoupon";
+import { useDeleteCouponMutation, useGetCouponQuery } from "../redux/api/couponApi";
+import dayjs from "dayjs";
+import { imageUrl } from "../redux/api/baseApi";
 
 const Coupons = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [coupons, setCoupons] = useState([]); // Will hold added coupons
+  const [currentPage, setCurrentPage] = useState(1);
+  const [deleteCoupon] = useDeleteCouponMutation();
+  const pageSize = 10;
 
-  // Dummy initial data (updated to match new form structure)
-  const initialDummyData = [
-    {
-      _id: "1",
-      imageUrl: "/uploads/coupon1.jpg",
-      reasonName: "Christmas Sale",
-      couponCode: "XMAS25",
-      category: "fashion",
-      quantityType: "limited",
-      quantity: 100,
-      startDate: "2025-12-01",
-      endDate: "2025-12-31",
-      discountType: "percentage",
-      discountValue: 25,
-    },
-    {
-      _id: "2",
-      imageUrl: "/uploads/coupon2.jpg",
-      reasonName: "New Year Free Shipping",
-      couponCode: "FREESHIP2026",
-      category: "electronics",
-      quantityType: "unlimited",
-      startDate: "2025-12-20",
-      endDate: "2026-01-15",
-      discountType: "flat",
-      discountValue: 15,
-    },
-    {
-      _id: "3",
-      imageUrl: "/uploads/coupon3.jpg",
-      reasonName: "Welcome Offer",
-      couponCode: "WELCOME10",
-      category: "beauty",
-      quantityType: "limited",
-      quantity: 50,
-      startDate: "2025-11-01",
-      endDate: "2025-12-24",
-      discountType: "flat",
-      discountValue: 10,
-    },
-  ];
+  const { data: couponData, isLoading } = useGetCouponQuery({
+    page: currentPage,
+    limit: pageSize,
+  });
 
-  const dataSource = coupons.length > 0 ? coupons : initialDummyData;
-
-  const handleDeleteCoupon = (id) => {
-    setCoupons(coupons.filter((c) => c._id !== id));
-    message.success("Coupon deleted successfully!");
+  const handleDeleteCoupon =async (id) => {
+   console.log(id);
+    try {
+      const res = await deleteCoupon(id).unwrap();
+      message.success(res?.message);
+    } catch (err) {
+      message.error(err?.data?.message);
+    }
   };
 
-  const getStatus = (startDate, endDate) => {
-    const today = "2025-12-25";
-    if (today < startDate) return "Upcoming";
-    if (today > endDate) return "Expired";
+ 
+
+
+  // ✅ Status calculation
+  const getStatus = (start, end) => {
+    const today = dayjs();
+    if (today.isBefore(start)) return "Upcoming";
+    if (today.isAfter(end)) return "Expired";
     return "Active";
   };
-  
-  // Helper to format discount display
-  const formatDiscount = (type, value) => {
-    return type === "percentage" ? `${value}% Off` : `$${value} Off`;
-  };
 
-  // Helper for quantity display
-  const formatQuantity = (type, quantity) => {
-    return type === "unlimited" ? "Unlimited" : quantity;
-  };
-
+  // ✅ Columns
   const columns = [
     {
       title: "Image",
-      dataIndex: "imageUrl",
-      key: "image",
+      dataIndex: "image",
       align: "center",
-      render: () => (
+      render: (img) => (
         <img
-          src="https://via.placeholder.com/80x60?text=Coupon+Image"
-          alt="Coupon"
-          className="w-20 h-16 object-cover rounded mx-auto"
+          src={`${imageUrl}${img}`}
+          alt="coupon"
+          className="w-20 h-14 object-cover rounded mx-auto"
         />
       ),
     },
     {
       title: "Reason Name",
-      dataIndex: "reasonName",
-      key: "reasonName",
+      dataIndex: "name",
       align: "center",
     },
     {
       title: "Coupon Code",
-      dataIndex: "couponCode",
-      key: "couponCode",
+      dataIndex: "code",
       align: "center",
-      render: (code) => <span className="font-mono font-bold">{code}</span>,
-    },
-    {
-      title: "Category",
-      dataIndex: "category",
-      key: "category",
-      align: "center",
-      render: (category) => (
-        <span className="capitalize">{category.replace("_", " ")}</span>
+      render: (code) => (
+        <span className="font-mono font-bold">{code}</span>
       ),
     },
     {
       title: "Quantity",
-      key: "quantity",
       align: "center",
       render: (_, record) =>
-        formatQuantity(record.quantityType, record.quantity),
+        record.usageLimit ? record.usageLimit : "Unlimited",
     },
     {
       title: "Start Date",
       dataIndex: "startDate",
-      key: "startDate",
       align: "center",
+      render: (date) => dayjs(date).format("YYYY-MM-DD"),
     },
     {
       title: "End Date",
       dataIndex: "endDate",
-      key: "endDate",
       align: "center",
+      render: (date) => dayjs(date).format("YYYY-MM-DD"),
     },
     {
-      title: "Discount Type",
-      dataIndex: "discountType",
-      key: "discountType",
-      align: "center",
-      render: (type) => (
-        <span className="capitalize">
-          {type === "flat" ? "Flat Amount" : "Percentage"}
-        </span>
-      ),
-    },
-    {
-      title: "Discount Value",
-      key: "discountValue",
+      title: "Discount",
       align: "center",
       render: (_, record) =>
-        formatDiscount(record.discountType, record.discountValue),
+        record.discountType === "PERCENTAGE"
+          ? `${record.discountValue}% Off`
+          : `$${record.discountValue} Off`,
     },
     {
       title: "Status",
-      key: "status",
       align: "center",
       render: (_, record) => {
         const status = getStatus(record.startDate, record.endDate);
         return (
           <span
-            className={`px-4 py-1 rounded-full text-xs font-medium ${
+            className={`px-3 py-1 rounded-full text-xs font-medium ${
               status === "Active"
                 ? "bg-green-100 text-green-800"
                 : status === "Expired"
@@ -170,19 +114,12 @@ const Coupons = () => {
     },
     {
       title: "Actions",
-      key: "actions",
       align: "center",
       render: (_, record) => (
-        <div className="flex justify-center gap-4">
-          <div
-            // onClick={() => handleEdit(record)}
-            className="w-[36px] h-[36px] text-lg bg-[#007BFF] flex justify-center items-center text-white rounded cursor-pointer"
-          >
-            <MdOutlineModeEdit />
-          </div>
+        <div className="flex justify-center gap-3">
           <div
             onClick={() => handleDeleteCoupon(record._id)}
-            className="w-9 h-9 text-lg bg-[#E63946] flex justify-center items-center text-white rounded cursor-pointer hover:bg-red-700 transition"
+            className="w-9 h-9 bg-red-500 text-white flex items-center justify-center rounded cursor-pointer"
           >
             <RiDeleteBin6Line />
           </div>
@@ -197,30 +134,34 @@ const Coupons = () => {
         <h2 className="text-2xl font-semibold">Coupons Management</h2>
         <button
           onClick={() => setOpenAddModal(true)}
-          className="bg-[#E63946] text-white px-6 py-2 rounded hover:bg-red-700 transition"
+          className="bg-[#E63946] text-white px-6 py-2 rounded"
         >
           Add Coupon
         </button>
       </div>
 
       <Table
-        dataSource={dataSource}
+        loading={isLoading}
+        dataSource={couponData?.data || []}
         columns={columns}
         rowKey="_id"
         pagination={false}
         scroll={{ x: "max-content" }}
-        className="custom-table"
       />
+
+      {/* Pagination */}
+      <div className="mt-5 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={couponData?.meta?.total || 0}
+          onChange={(page) => setCurrentPage(page)}
+        />
+      </div>
 
       <AddCoupon
         openAddModal={openAddModal}
         setOpenAddModal={setOpenAddModal}
-        onAddCoupon={(newCoupon) => {
-          setCoupons([
-            ...coupons,
-            { ...newCoupon, _id: Date.now().toString() },
-          ]);
-        }}
       />
     </div>
   );
