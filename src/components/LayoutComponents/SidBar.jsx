@@ -1,4 +1,3 @@
-
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { FaChevronRight, FaHome, FaJediOrder } from "react-icons/fa";
@@ -6,19 +5,18 @@ import { IoIosLogIn } from "react-icons/io";
 import { logout } from "../../page/redux/features/auth/authSlice";
 import { useDispatch } from "react-redux";
 import { FiUser } from "react-icons/fi";
-
 import { FaBorderAll } from "react-icons/fa";
 import { MdContactSupport } from "react-icons/md";
 import { TbCategory2, TbLogs } from "react-icons/tb";
 import { VscSymbolColor } from "react-icons/vsc";
 import { IoSettingsOutline } from "react-icons/io5";
 import { MdFormatSize } from "react-icons/md";
-
 import { CiDiscount1 } from "react-icons/ci";
 import { BsPostcard } from "react-icons/bs";
 import { LiaTshirtSolid } from "react-icons/lia";
 import { TiTags } from "react-icons/ti";
 import { LiaCartArrowDownSolid } from "react-icons/lia";
+import { MarkIcon } from "./Image";
 
 const items = [
   {
@@ -64,7 +62,7 @@ const items = [
     icon: <FaBorderAll />,
     link: "/dashboard/banner",
   },
-     {
+  {
     key: "size",
     label: "Size",
     icon: <MdFormatSize />,
@@ -88,7 +86,7 @@ const items = [
     icon: <LiaTshirtSolid />,
     link: "/dashboard/product",
   },
- {
+  {
     key: "blog",
     label: "blog",
     icon: <BsPostcard />,
@@ -158,9 +156,7 @@ const SidBar = () => {
 
   useEffect(() => {
     const currentPath = location.pathname;
-
     let activeParent = null;
-
     items.forEach((item) => {
       if (item.link === currentPath) {
         activeParent = item;
@@ -201,9 +197,7 @@ const SidBar = () => {
   return (
     <div className="custom-sidebar h-[100vh] ">
       <div className="custom-sidebar-logo flex justify-center">
-        <h1 className="text-4xl font-bold text-red-600 py-4">
-          Shs<span>o</span>pflo
-        </h1>
+        <MarkIcon color="red"></MarkIcon>
       </div>
       <div className="menu-items">
         {items.map((item) => {

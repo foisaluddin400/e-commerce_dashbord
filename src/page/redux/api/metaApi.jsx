@@ -43,10 +43,8 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-
-
- getbanner: builder.query({
-      query: ({page, limit}) => {
+    getbanner: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/banners?page=${page}&limit=${limit}`,
           method: "GET",
@@ -86,10 +84,35 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+    getTerms: builder.query({
+      query: () => {
+        return {
+          url: `/pages/terms`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
 
+    getPrivecy: builder.query({
+      query: () => {
+        return {
+          url: `/pages/privacy`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
 
-
-
+    getAboutus: builder.query({
+      query: () => {
+        return {
+          url: `/pages/about`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
 
     getContact: builder.query({
       query: () => {
@@ -101,8 +124,8 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-       getClientContact: builder.query({
-      query: ({page, limit}) => {
+    getClientContact: builder.query({
+      query: ({ page, limit }) => {
         return {
           url: `/contact/messages?page=${page}&limit=${limit}`,
           method: "GET",
@@ -122,7 +145,7 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
-      deleteContactClients: builder.mutation({
+    deleteContactClients: builder.mutation({
       query: (id) => {
         return {
           url: `/contact/messages/${id}`,
@@ -132,8 +155,38 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+    updateTerms: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/pages/terms`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
+    updatePrivecy: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/pages/privacy`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
+    updateAboutUs: builder.mutation({
+      query: (data) => {
+        return {
+          url: `/pages/about`,
+          method: "PUT",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
 
     getOrder: builder.query({
       query: () => {
@@ -145,8 +198,7 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
-
-  updateOrder: builder.mutation({
+    updateOrder: builder.mutation({
       query: ({ data, id }) => {
         return {
           url: `/orders/${id}/status`,
@@ -156,9 +208,6 @@ const meta = baseApi.injectEndpoints({
       },
       invalidatesTags: ["updateProfile"],
     }),
-
-
-
 
     //     getUserAll: builder.query({
     //       query: ({ page, limit }) => {
@@ -317,5 +366,13 @@ export const {
   useGetOrderQuery,
   useUpdateOrderMutation,
   useAddBannerMutation,
-  useDeleteBannerMutation,useGetbannerQuery,useUpdateBannerMutation
+  useDeleteBannerMutation,
+  useGetbannerQuery,
+  useUpdateBannerMutation,
+  useGetAboutusQuery,
+  useGetPrivecyQuery,
+  useGetTermsQuery,
+  useUpdateAboutUsMutation,
+  useUpdatePrivecyMutation,
+  useUpdateTermsMutation,
 } = meta;
