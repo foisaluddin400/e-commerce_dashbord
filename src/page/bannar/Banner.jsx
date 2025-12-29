@@ -99,7 +99,7 @@ const Banner = () => {
       form.resetFields();
       setFileList([]);
     } catch {
-      message.error("Operation failed");
+      message.error("Must be jpg, png, jpeg format");
     }
   };
 

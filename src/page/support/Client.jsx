@@ -1,26 +1,27 @@
-import React, { useState } from 'react';
-import { useDeleteContactClientsMutation, useGetClientContactQuery } from '../redux/api/metaApi';
-import moment from 'moment';
-import { message, Pagination, Skeleton } from 'antd';
-import { DeleteIcon } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  useDeleteContactClientsMutation,
+  useGetClientContactQuery,
+} from "../redux/api/metaApi";
+import moment from "moment";
+import { message, Pagination, Skeleton } from "antd";
+import { DeleteIcon } from "lucide-react";
 
 const Client = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-
   const { data: clientContactData, isLoading } = useGetClientContactQuery({
     page: currentPage,
     limit: pageSize,
   });
 
   const [deleteContact] = useDeleteContactClientsMutation();
-
   const handleDeleteCategory = async (id) => {
     try {
       const res = await deleteContact(id).unwrap();
-      message.success(res?.message);
+      message.success(res?.message || "Contact deleted successfully");
     } catch (err) {
-      message.error(err?.data?.message);
+      message.error(err?.data?.message || "Failed to delete contact");
     }
   };
 
@@ -28,7 +29,6 @@ const Client = () => {
 
   return (
     <div className="space-y-3">
-      {/* Skeleton while loading */}
       {isLoading ? (
         Array.from({ length: 5 }).map((_, i) => (
           <div
@@ -36,9 +36,17 @@ const Client = () => {
             className="flex justify-between items-center px-4 py-3 rounded bg-gray-100"
           >
             <div className="flex-1">
-              <Skeleton.Input active size="small" style={{ width: 120, marginBottom: 8 }} />
-              <Skeleton.Input active size="small" style={{ width: 200, marginBottom: 8 }} />
-              <Skeleton.Input active size="small" style={{ width: '90%' }} />
+              <Skeleton.Input
+                active
+                size="small"
+                style={{ width: 120, marginBottom: 8 }}
+              />
+              <Skeleton.Input
+                active
+                size="small"
+                style={{ width: 200, marginBottom: 8 }}
+              />
+              <Skeleton.Input active size="small" style={{ width: "90%" }} />
             </div>
             <div className="flex flex-col items-end gap-2">
               <Skeleton.Input active size="small" style={{ width: 150 }} />
@@ -60,7 +68,7 @@ const Client = () => {
               <p className="text-gray-500 text-sm">{item.message}</p>
             </div>
             <div className="flex gap-4 text-gray-700 font-medium text-sm items-center">
-              {moment(item.createdAt).format('DD MMM, YYYY, hh:mm A')}
+              {moment(item.createdAt).format("DD MMM, YYYY, hh:mm A")}
               <div
                 className="cursor-pointer text-red-500 hover:text-red-700"
                 onClick={() => handleDeleteCategory(item._id)}

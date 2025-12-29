@@ -203,7 +203,7 @@ const Vendor = () => {
           <Form.Item className="pt-3">
             <button
               type="submit"
-              className="px-11 bg-[#0091FF] text-white py-2 rounded"
+              className="px-11 bg-[#E63946] text-white py-2 rounded"
             >
               Save
             </button>

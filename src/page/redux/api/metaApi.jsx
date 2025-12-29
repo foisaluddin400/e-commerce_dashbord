@@ -198,6 +198,46 @@ const meta = baseApi.injectEndpoints({
       providesTags: ["updateProfile"],
     }),
 
+    getStatus: builder.query({
+      query: () => {
+        return {
+          url: `/dashboard/stats`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    getUserGrowth: builder.query({
+      query: () => {
+        return {
+          url: `/dashboard/user-growth`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    getOrderGrowth: builder.query({
+      query: () => {
+        return {
+          url: `/dashboard/order-growth`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    getEarningGrowth: builder.query({
+      query: () => {
+        return {
+          url: `/dashboard/earnings-growth`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
     updateOrder: builder.mutation({
       query: ({ data, id }) => {
         return {
@@ -375,4 +415,8 @@ export const {
   useUpdateAboutUsMutation,
   useUpdatePrivecyMutation,
   useUpdateTermsMutation,
+  useGetStatusQuery,
+  useGetUserGrowthQuery,
+  useGetOrderGrowthQuery,
+  useGetEarningGrowthQuery,
 } = meta;

@@ -136,7 +136,7 @@ const AddCoupon = ({ openAddModal, setOpenAddModal }) => {
         <Form.Item
           label="Category"
           name="category"
-          rules={[{ required: true }]}
+          rules={[{ required: false }]}
         >
           <Select placeholder="Select category">
             {categoryData?.data?.map((cat) => (

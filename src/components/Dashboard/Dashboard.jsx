@@ -6,7 +6,9 @@ import UserGrowthChart from "./UserGrowthChart";
 import { HiOutlineUserGroup } from "react-icons/hi2";
 import { VscNote } from "react-icons/vsc";
 import { PiMoneyLight } from "react-icons/pi";
+import { useGetStatusQuery } from "../../page/redux/api/metaApi";
 const Dashboard = () => {
+  const {data: dashboardData} = useGetStatusQuery();
   return (
     <div className=" ">
       <div className="grid grid-cols-4 gap-4">
@@ -15,7 +17,7 @@ const Dashboard = () => {
             <HiOutlineUserGroup className="text-yellow-500" />
           </div>
           <div>
-            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="font-semibold text-2xl">{dashboardData?.data?.totalUsers || 0}</h1>
             <h1 className="text-zinc-500"> Total User</h1>
           </div>
         </div>
@@ -24,7 +26,7 @@ const Dashboard = () => {
             <RiUserForbidLine className="text-sky-600" />
           </div>
           <div>
-            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="font-semibold text-2xl">{dashboardData?.data?.totalBlocked || 0}</h1>
             <h1 className="text-zinc-500"> User Block</h1>
           </div>
         </div>
@@ -33,7 +35,7 @@ const Dashboard = () => {
             <VscNote className="text-green-500" />
           </div>
           <div>
-            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="font-semibold text-2xl">{dashboardData?.data?.totalOrders || 0}</h1>
             <h1 className="text-zinc-500"> Total Booking</h1>
           </div>
         </div>
@@ -42,7 +44,7 @@ const Dashboard = () => {
             <PiMoneyLight className="text-purple-500" />
           </div>
           <div>
-            <h1 className="font-semibold text-2xl">1,100</h1>
+            <h1 className="font-semibold text-2xl">{dashboardData?.data?.totalEarnings || 0}</h1>
             <h1 className="text-zinc-500"> Total Earning</h1>
           </div>
         </div>
