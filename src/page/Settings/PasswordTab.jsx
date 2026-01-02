@@ -1,37 +1,40 @@
-import { Button, Form, Input, message } from "antd";
+import { Button, Form, Input, message, Spin } from "antd";
 import React, { useState } from "react";
 
 import { useNavigate } from "react-router-dom";
-
+import { useChangePasswordMutation } from "../redux/api/userApi";
 
 export const PasswordTab = () => {
-//   const [changePassword] = useChangePasswordMutation();
-
+  const [changePassword] = useChangePasswordMutation();
+  const [loading, setLoading] = useState(false);
   const [passError, setPassError] = useState("");
   const navigate = useNavigate();
 
   const handlePasswordChange = async (values) => {
-    // if (values?.newPassword === values.oldPassword) {
-    //   return setPassError("Your old password cannot be your new password.");
-    // }
-    // if (values?.newPassword !== values?.confirmPassword) {
-    //   return setPassError("Confirm password doesn't match.");
-    // } else {
-    //   setPassError("");
-    // }
+    if (values?.newPassword === values.oldPassword) {
+      return setPassError("Your old password cannot be your new password.");
+    }
+    if (values?.newPassword !== values?.confirmPassword) {
+      return setPassError("Confirm password doesn't match.");
+    } else {
+      setPassError("");
+    }
 
-    // const data = {
-    //   current_password: values.currentPassword,
-    //   new_password: values.newPassword,
-    // };
-    // try {
-    //   const response = await changePassword(data).unwrap();
-    //   message.success(response.message);
-    //   console.log(response);
-    // } catch (error) {
-    //   console.log(error);
-    //   message.error(error.data.message);
-    // }
+    const data = {
+      currentPassword: values.currentPassword,
+      newPassword: values.newPassword,
+    };
+    setLoading(true);
+    try {
+      const response = await changePassword(data).unwrap();
+      message.success(response.message);
+      console.log(response);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      message.error(error.data.message);
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,7 +51,10 @@ export const PasswordTab = () => {
             { required: true, message: "Please enter your current password!" },
           ]}
         >
-          <Input.Password style={{ padding: "9px", borderRadius: "0px" }} placeholder="Old Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="Old Password"
+          />
         </Form.Item>
 
         <Form.Item
@@ -56,7 +62,10 @@ export const PasswordTab = () => {
           label="New Password"
           rules={[{ required: true, message: "Please enter a new password!" }]}
         >
-          <Input.Password  style={{ padding: "9px", borderRadius: "0px" }} placeholder="New Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="New Password"
+          />
         </Form.Item>
 
         <Form.Item
@@ -75,7 +84,10 @@ export const PasswordTab = () => {
             }),
           ]}
         >
-          <Input.Password style={{ padding: "9px", borderRadius: "0px" }} placeholder="Confirm Password" />
+          <Input.Password
+            style={{ padding: "9px", borderRadius: "0px" }}
+            placeholder="Confirm Password"
+          />
         </Form.Item>
 
         {/* Display error if password validations fail */}
@@ -83,9 +95,19 @@ export const PasswordTab = () => {
 
         <Form.Item>
           <div className="flex justify-center">
-          <button type="submit" className="w-full bg-[#E63946] text-white py-2">
-                Change Password
-              </button>
+            <button
+              type="submit"
+              className="w-full bg-[#E63946] text-white py-2"
+              disabled={loading}
+            >
+                 {loading ? (
+              <>
+                <Spin size="small" /> <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
+            </button>
           </div>
         </Form.Item>
       </Form>

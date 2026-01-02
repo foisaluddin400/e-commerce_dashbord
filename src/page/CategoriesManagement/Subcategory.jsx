@@ -126,7 +126,8 @@ const Subcategory = () => {
         </div>
       </div>
 
-      <Table columns={columns} dataSource={dataSource} pagination={false} />
+      <Table columns={columns} dataSource={dataSource}   className="custom-table"
+        scroll={{ x: "max-content" }} pagination={false} />
       <div className="mt-4 flex justify-center">
         <Pagination
           current={currentPage}

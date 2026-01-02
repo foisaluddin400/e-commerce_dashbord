@@ -11,6 +11,51 @@ const coupon = baseApi.injectEndpoints({
       },
       providesTags: ["updateProfile"],
     }),
+
+
+  getIcon: builder.query({
+      query: ({ page, limit, search }) => {
+        return {
+          url: `/icons?search=${search}&page=${page}&limit=${limit}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+    addicon: builder.mutation({
+      query: (data) => {
+        return {
+          url: "/icons",
+          method: "POST",
+          body: data,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    
+    deleteicon: builder.mutation({
+      query: (id) => {
+        return {
+          url: `/icons/${id}`,
+          method: "DELETE",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+    updateIcon: builder.mutation({
+      query: ({ formData, id }) => {
+        return {
+          url: `/icons/${id}`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
+
+
     addCoupon: builder.mutation({
       query: (data) => {
         return {
@@ -56,5 +101,8 @@ export const {
   useDeleteCouponMutation,
   useGetCouponQuery,
   useUpdateFaqMutation,
- 
+ useGetIconQuery,
+ useAddiconMutation,
+ useDeleteiconMutation,
+ useUpdateIconMutation,
 } = coupon;

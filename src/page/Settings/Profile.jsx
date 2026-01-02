@@ -1,43 +1,54 @@
 import { useState, useEffect } from "react";
-import { Avatar, Upload, Form, Input, Button, message } from "antd";
+import { Avatar, Upload, Form, Input, Button, message, Spin } from "antd";
 import { IoCameraOutline } from "react-icons/io5";
 import { PasswordTab } from "./PasswordTab";
+import {
+  useGetProfileQuery,
+  useUpdateProfileMutation,
+} from "../redux/api/userApi";
+import { imageUrl } from "../redux/api/baseApi";
 
 const Profile = () => {
+    const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("1");
-  // const[updateProfile] = useUpdateProfileMutation();
+  const [updateProfile] = useUpdateProfileMutation();
   const [form] = Form.useForm();
   const [image, setImage] = useState();
-  // const {data: profile} = useGetProfileQuery()
+  const { data: profile } = useGetProfileQuery();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImage(file);
   };
 
-  // useEffect(() => {
-  //   if (profile) {
-  //     form.setFieldsValue({
-  //       name: profile.name,
-  //       email: profile.email,
-  //       phone: profile.phone,
-  //     });
-  //   }
-  // }, [profile, form]);
+  useEffect(() => {
+    if (profile) {
+      form.setFieldsValue({
+        firstName: profile?.data?.firstName,
+        lastName: profile?.data?.lastName,
+        email: profile?.data?.email,
+        phone: profile?.data?.phone,
+      });
+    }
+  }, [profile, form]);
 
   const onEditProfile = async (values) => {
-    // const data = new FormData();
-    // if (image) data.append("photo", image);
-    // data.append("name", values.name);
-    // data.append("phone", values.phone);
-    //  try {
-    //       const response = await updateProfile(data).unwrap();
-    //       console.log(response)
-    //       message.success(response.message);
-    //     } catch (error) {
-    //       message.error(error.data.message);
-    //       console.log(error);
-    //     }
+    const data = new FormData();
+    if (image) data.append("image", image);
+    data.append("firstName", values.firstName);
+    data.append("lastName", values.lastName);
+    data.append("phone", values.phone);
+    setLoading(true);
+    try {
+      const response = await updateProfile(data).unwrap();
+      console.log(response);
+      message.success(response.message);
+      setLoading(false);
+    } catch (error) {
+      message.error(error.data.message);
+      setLoading(false);
+      console.log(error);
+    }
   };
 
   const tabItems = [
@@ -46,13 +57,23 @@ const Profile = () => {
       label: "Edit Profile",
       content: (
         <Form onFinish={onEditProfile} layout="vertical" form={form}>
-          <Form.Item name="name" label="Name">
-            <Input
-              style={{ padding: "9px", borderRadius: "0px" }}
-              placeholder="Enter name"
-              rules={[{ required: true, message: "Please write a Email" }]}
-            />
-          </Form.Item>
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item name="firstName" label="First Name">
+              <Input
+                style={{ padding: "9px", borderRadius: "0px" }}
+                placeholder="Enter First Name"
+                rules={[{ required: true, message: "Please write First Name" }]}
+              />
+            </Form.Item>
+
+            <Form.Item name="lastName" label="Last Name">
+              <Input
+                style={{ padding: "9px", borderRadius: "0px" }}
+                placeholder="Enter Last Name"
+                rules={[{ required: true, message: "Please write Last Name" }]}
+              />
+            </Form.Item>
+          </div>
 
           <Form.Item name="email" label="Email">
             <Input
@@ -72,10 +93,17 @@ const Profile = () => {
           </Form.Item>
 
           <button
-            type="primary"
+            type="submit"
             className="w-full bg-[#E63946] text-white py-2"
+            disabled={loading}
           >
-            Update
+               {loading ? (
+              <>
+                <Spin size="small" /> <span>Submitting...</span>
+              </>
+            ) : (
+              "Submit"
+            )}
           </button>
         </Form>
       ),
@@ -102,7 +130,7 @@ const Profile = () => {
               />
               <img
                 style={{ width: 140, height: 140, borderRadius: "100%" }}
-                src={`${image ? URL.createObjectURL(image) : `ddd`}`}
+                src={`${imageUrl}${profile?.data?.imageUrl}`}
                 alt="Admin Profile"
               />
               {activeTab === "1" && (

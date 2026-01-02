@@ -14,18 +14,23 @@ import {
   LoadingOutlined,
   DownloadOutlined,
 } from "@ant-design/icons";
-import { MdModeEditOutline } from "react-icons/md";
+
 import { LuEye } from "react-icons/lu";
-import { FaArrowLeft } from "react-icons/fa";
+
 import { useNavigate } from "react-router-dom";
 import OrderEdit from "./OrderEdit";
 import { useGetOrderQuery, useUpdateOrderMutation } from "../redux/api/metaApi";
 import { imageUrl } from "../redux/api/baseApi";
+import { Navigate } from "../../Navigate";
 
 const { Option } = Select;
 
 const Order = () => {
   const navigate = useNavigate();
+   const [statusFilter, setStatusFilter] = useState("");
+     const [search, setSearch] = useState("");
+     const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   const { data: orderResponse, isLoading, refetch } = useGetOrderQuery();
   const orderData = orderResponse?.data || [];
 
@@ -33,11 +38,11 @@ const Order = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+ 
   const [editModal, setEditModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState(null);
 
-  const pageSize = 10;
+  
 
   // Direct Download Function (No Link Opening)
   const downloadImage = async (imageUrl, fileName) => {
@@ -127,7 +132,7 @@ const Order = () => {
     {
       title: "Product Name",
       render: (_, record) => {
-        const names = record.items.map((item) => item.product.productName);
+        const names = record?.items.map((item) => item?.product?.productName);
         return names.join(", ");
       },
     },
@@ -139,10 +144,10 @@ const Order = () => {
     {
       title: "Qty",
       render: (_, record) => {
-        return record.items.reduce((total, item) => {
+        return record?.items.reduce((total, item) => {
           return (
             total +
-            item.variantQuantities.reduce(
+            item.variantQuantities?.reduce(
               (sum, v) =>
                 sum + v.sizeQuantities.reduce((s, sq) => s + sq.quantity, 0),
               0
@@ -158,13 +163,13 @@ const Order = () => {
         <Select
           defaultValue={status}
           style={{ width: 130 }}
-          onChange={(value) => handleStatusChange(record._id, value)}
+          onChange={(value) => handleStatusChange(record?._id, value)}
           loading={isUpdating}
           disabled={isUpdating}
         >
-          {statusOptions.map((opt) => (
-            <Option key={opt.value} value={opt.value}>
-              {opt.label}
+          {statusOptions?.map((opt) => (
+            <Option key={opt?.value} value={opt?.value}>
+              {opt?.label}
             </Option>
           ))}
         </Select>
@@ -178,7 +183,6 @@ const Order = () => {
           <button onClick={() => openModal(record)} className="text-black">
             <LuEye size={20} />
           </button>
-         
         </div>
       ),
     },
@@ -193,29 +197,46 @@ const Order = () => {
   }
 
   return (
-    <div className="bg-white mt-4 p-6 rounded-lg shadow">
+    <div className="bg-white p-3 h-[87vh]">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="flex items-center gap-4 text-lg font-semibold">
-          <button className="text-red-500" onClick={() => navigate(-1)}>
-            <FaArrowLeft />
-          </button>
-          <span>Order</span>
-        </h1>
-        <Input
-          placeholder="Search here..."
-          prefix={<SearchOutlined />}
-          style={{ maxWidth: "300px" }}
-        />
-      </div>
+        <Navigate title="Order" />
+        <div className="flex gap-4 items-center">
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 150, height: "42px" }}
+            options={[
+              { value: "", label: "All" },
+              { value: "Pending", label: "Pending" },
+              { value: "Delivered", label: "Delivered" },
+              { value: "Confirmed", label: "Confirmed" },
+              { value: "Processing", label: "Processing" },
+              { value: "Cancelled", label: "Cancelled" },
+              { value: "Shipped", label: "Shipped" },
+            ]}
+          />
 
+          <Input
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
+            value={search}
+            placeholder="Search by name..."
+            prefix={<SearchOutlined />}
+            style={{ width: "300px", height: "40px" }}
+          />
+        </div>
+      </div>
       {/* Table */}
       <Table
         columns={columns}
         dataSource={orderData}
         pagination={false}
         rowKey="_id"
-        scroll={{ x: 1000 }}
+        className="custom-table"
+        scroll={{ x: "max-content" }}
       />
 
       {/* Pagination */}
@@ -245,18 +266,18 @@ const Order = () => {
               <div className="grid grid-cols-2 gap-6 text-sm">
                 <div className="space-y-2">
                   <p>
-                    <strong>Order ID:</strong> {selectedOrder._id}
+                    <strong>Order ID:</strong> {selectedOrder?._id}
                   </p>
                   <p>
-                    <strong>Customer:</strong> {selectedOrder.user.firstName}{" "}
-                    {selectedOrder.user.lastName}
+                    <strong>Customer:</strong> {selectedOrder?.user?.firstName}{" "}
+                    {selectedOrder?.user?.lastName}
                   </p>
                   <p>
-                    <strong>Email:</strong> {selectedOrder.user.email}
+                    <strong>Email:</strong> {selectedOrder?.user?.email}
                   </p>
                   <p>
                     <strong>Order Date:</strong>{" "}
-                    {formatDate(selectedOrder.orderDate)}
+                    {formatDate(selectedOrder?.orderDate)}
                   </p>
                 </div>
                 <div className="space-y-2">
@@ -264,36 +285,36 @@ const Order = () => {
                     <strong>Payment Status:</strong>{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        selectedOrder.paymentStatus === "paid"
+                        selectedOrder?.paymentStatus === "paid"
                           ? "bg-green-100 text-green-700"
                           : "bg-yellow-100 text-yellow-700"
                       }`}
                     >
-                      {selectedOrder.paymentStatus.toUpperCase()}
+                      {selectedOrder?.paymentStatus.toUpperCase()}
                     </span>
                   </p>
                   <p>
                     <strong>Order Status:</strong>{" "}
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        selectedOrder.status === "delivered"
+                        selectedOrder?.status === "delivered"
                           ? "bg-green-100 text-green-700"
                           : "bg-blue-100 text-blue-700"
                       }`}
                     >
-                      {selectedOrder.status.toUpperCase()}
+                      {selectedOrder?.status.toUpperCase()}
                     </span>
                   </p>
                   <p>
                     <strong>Total Amount:</strong>{" "}
                     <span className="font-bold text-lg">
-                      ${selectedOrder.total}
+                      ${selectedOrder?.total}
                     </span>
                   </p>
                   <p>
                     <strong>Shipping Address:</strong>{" "}
-                    {selectedOrder.address.city}, {selectedOrder.address.state},{" "}
-                    {selectedOrder.address.country}
+                    {selectedOrder?.address?.city}, {selectedOrder?.address?.state},{" "}
+                    {selectedOrder?.address?.country}
                   </p>
                 </div>
               </div>
@@ -304,7 +325,7 @@ const Order = () => {
               <h3 className="font-bold text-lg mb-3">Order Items</h3>
               {selectedOrder.items.map((item) => (
                 <div
-                  key={item._id}
+                  key={item?._id}
                   className="border rounded-lg p-6 mb-6 bg-white shadow-sm"
                 >
                   {/* Product Header */}
@@ -313,10 +334,10 @@ const Order = () => {
                       <Image
                         src={`${imageUrl}${
                           item.design
-                            ? item.design.frontImage
-                            : item.product.thumbnail
+                            ? item?.design?.frontImage
+                            : item?.product?.thumbnail
                         }`}
-                        alt={item.product.productName}
+                        alt={item?.product?.productName}
                         width={80}
                         height={80}
                         preview={true}
@@ -328,10 +349,10 @@ const Order = () => {
                           downloadImage(
                             `${imageUrl}${
                               item.design
-                                ? item.design.frontImage
-                                : item.product.thumbnail
+                                ? item?.design?.frontImage
+                                : item?.product?.thumbnail
                             }`,
-                            `${item.product.productName}_thumbnail.jpg`
+                            `${item?.product?.productName}_thumbnail.jpg`
                           );
                         }}
                         className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1.5 shadow-md hover:bg-gray-100"
@@ -345,15 +366,15 @@ const Order = () => {
 
                     <div className="flex-1">
                       <h4 className="font-semibold text-lg">
-                        {item.product.productName}
+                        {item?.product?.productName}
                       </h4>
                       <p className="text-sm text-gray-600">
-                        <strong>Brand:</strong> {item.product.brand.brandName}
+                        <strong>Brand:</strong> {item?.product?.brand?.brandName}
                       </p>
-                      {item.product.brand.brandLogo && (
+                      {item?.product?.brand?.brandLogo && (
                         <div className="relative group inline-block">
                           <Image
-                            src={`${imageUrl}${item.product.brand.brandLogo}`}
+                            src={`${imageUrl}${item?.product?.brand?.brandLogo}`}
                             alt="Brand Logo"
                             width={48}
                             height={48}
@@ -364,8 +385,8 @@ const Order = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               downloadImage(
-                                `${imageUrl}${item.product.brand.brandLogo}`,
-                                `${item.product.brand.brandName}_logo.jpg`
+                                `${imageUrl}${item?.product?.brand?.brandLogo}`,
+                                `${item?.product?.brand?.brandName}_logo.jpg`
                               );
                             }}
                             className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
@@ -380,13 +401,13 @@ const Order = () => {
                     </div>
 
                     <div className="text-right">
-                      <p className="font-medium">${item.itemTotal}</p>
+                      <p className="font-medium">${item?.itemTotal}</p>
                       <p className="text-sm text-gray-600">
                         Qty:{" "}
-                        {item.variantQuantities.reduce(
+                        {item?.variantQuantities.reduce(
                           (sum, v) =>
                             sum +
-                            v.sizeQuantities.reduce(
+                            v?.sizeQuantities.reduce(
                               (s, sq) => s + sq.quantity,
                               0
                             ),
@@ -463,7 +484,10 @@ const Order = () => {
                                     title={`Download ${side} Image`}
                                   >
                                     <DownloadOutlined
-                                      style={{ fontSize: "14px", color: "#1890ff" }}
+                                      style={{
+                                        fontSize: "14px",
+                                        color: "#1890ff",
+                                      }}
                                     />
                                   </button>
                                   <p className="text-xs mt-1 capitalize">
@@ -483,7 +507,6 @@ const Order = () => {
                               >
                                 <p className="font-semibold">{sq.size.name}</p>
                                 <p>Qty: {sq.quantity}</p>
-                                
                               </div>
                             ))}
                           </div>
@@ -532,7 +555,10 @@ const Order = () => {
                                   title={`Download ${side} Design`}
                                 >
                                   <DownloadOutlined
-                                    style={{ fontSize: "14px", color: "#1890ff" }}
+                                    style={{
+                                      fontSize: "14px",
+                                      color: "#1890ff",
+                                    }}
                                   />
                                 </button>
                                 <p className="text-center text-xs font-medium capitalize bg-gray-50 py-1 border-t">
@@ -575,7 +601,10 @@ const Order = () => {
                                   title={`Download ${side} Element`}
                                 >
                                   <DownloadOutlined
-                                    style={{ fontSize: "14px", color: "#1890ff" }}
+                                    style={{
+                                      fontSize: "14px",
+                                      color: "#1890ff",
+                                    }}
                                   />
                                 </button>
                                 <p className="text-center text-xs font-medium capitalize bg-blue-50 py-1 border-t">

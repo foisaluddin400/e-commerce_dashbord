@@ -1,4 +1,4 @@
-import { Input, message, Pagination, Table } from "antd";
+import { Input, message, Pagination, Popconfirm, Table } from "antd";
 import { useState } from "react";
 import { MdOutlineModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
@@ -28,7 +28,7 @@ const Categories = () => {
   const [openAddModal, setOpenAddModal] = useState(false);
   const [editModal, setEditModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  
+
   const navigate = useNavigate();
   const handleDeleteCategory = async (id) => {
     console.log(id);
@@ -84,12 +84,16 @@ const Categories = () => {
           >
             <MdOutlineModeEdit />
           </div>
-          <div
-            onClick={() => handleDeleteCategory(record._id)}
-            className="w-[36px] h-[36px] text-lg bg-[#E63946] flex justify-center items-center text-white rounded cursor-pointer"
+          <Popconfirm
+            title="Are you sure to delete this Category?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDeleteCategory(record._id)}
           >
-            <RiDeleteBin6Line />
-          </div>
+            <div className="w-[36px] h-[36px] text-lg bg-[#E63946] flex justify-center items-center text-white rounded cursor-pointer">
+              <RiDeleteBin6Line />
+            </div>
+          </Popconfirm>
         </div>
       ),
     },

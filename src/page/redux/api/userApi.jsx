@@ -16,7 +16,34 @@ const useApi = baseApi.injectEndpoints({
     getProfile: builder.query({
       query: () => {
         return {
-          url: "/admin/profile",
+          url: "/auth/profile",
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+       getUser: builder.query({
+       query: ({ status, search, limit, page }) => {
+        const params = new URLSearchParams();
+
+        if (status !== "" && status !== undefined) {
+          params.append("status", status);
+        }
+
+        if (search) {
+          params.append("search", search);
+        }
+
+        if (page) {
+          params.append("page", page);
+        }
+
+        if (limit) {
+          params.append("limit", limit);
+        }
+
+        return {
+          url: `/users?${params.toString()}`,
           method: "GET",
         };
       },
@@ -52,7 +79,7 @@ const useApi = baseApi.injectEndpoints({
     updateProfile: builder.mutation({
       query: (data) => {
         return {
-          url: "/admin/edit-profile",
+          url: "/auth/profile",
           method: "PATCH",
           body: data,
         };
@@ -63,7 +90,7 @@ const useApi = baseApi.injectEndpoints({
       query: (data) => {
         return {
           url: "/auth/change-password",
-          method: "PUT",
+          method: "PATCH",
           body: data,
         };
       },
@@ -79,13 +106,13 @@ const useApi = baseApi.injectEndpoints({
       providesTags: ["host"],
     }),
 
-    blockUserHost: builder.mutation({
-      query: (data) => ({
-        url: `/dashboard/block-unblock-user`,
+    blockUser: builder.mutation({
+      query: (id) => ({
+        url: `/users/${id}/toggle-block`,
         method: "PATCH",
-        body: data,
+    
       }),
-      invalidatesTags: ["host"], 
+      invalidatesTags: ["updateProfile"], 
     }),
   }),
 });
@@ -99,5 +126,6 @@ export const {
   useUpdateProfileMutation,
   useChangePasswordMutation,
   useGetHostUserQuery,
-  useBlockUserHostMutation,
+useBlockUserMutation,
+  useGetUserQuery
 } = useApi;

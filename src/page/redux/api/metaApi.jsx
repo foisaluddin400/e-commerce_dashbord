@@ -188,6 +188,15 @@ const meta = baseApi.injectEndpoints({
       invalidatesTags: ["updateProfile"],
     }),
 
+    readNotification: builder.mutation({
+      query: () => {
+        return {
+          url: `/notifications/read-all`,
+          method: "PUT",
+        };
+      },
+      invalidatesTags: ["updateProfile"],
+    }),
     getOrder: builder.query({
       query: () => {
         return {
@@ -202,6 +211,16 @@ const meta = baseApi.injectEndpoints({
       query: () => {
         return {
           url: `/dashboard/stats`,
+          method: "GET",
+        };
+      },
+      providesTags: ["updateProfile"],
+    }),
+
+    getNotification: builder.query({
+      query: () => {
+        return {
+          url: `/notifications`,
           method: "GET",
         };
       },
@@ -419,4 +438,6 @@ export const {
   useGetUserGrowthQuery,
   useGetOrderGrowthQuery,
   useGetEarningGrowthQuery,
+  useGetNotificationQuery,
+  useReadNotificationMutation
 } = meta;

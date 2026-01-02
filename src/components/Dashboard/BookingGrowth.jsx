@@ -1,118 +1,93 @@
-import { Select } from "antd";
-import React, { useState } from "react";
 import {
-  ResponsiveContainer,
-  AreaChart,
-  Area,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
+import React, { useEffect, useMemo, useState } from "react";
+import { Select } from "antd";
+import { useGetEarningGrowthQuery, useGetOrderGrowthQuery, useGetUserGrowthQuery } from "../../page/redux/api/metaApi";
 
-const data = {
-  2024: [
-    { month: "Jan", value: 100 },
-    { month: "Feb", value: 90 },
-    { month: "Mar", value: 300 },
-    { month: "Apr", value: 250 },
-    { month: "May", value: 300 },
-    { month: "Jun", value: 20 },
-    { month: "Jul", value: 400 },
-    { month: "Aug", value: 250 },
-    { month: "Sep", value: 700 },
-    { month: "Oct", value: 50 },
-    { month: "Nov", value: 600 },
-    { month: "Dec", value: 155 },
-  ],
-  2023: [
-    { month: "Jan", value: 100 },
-    { month: "Feb", value: 90 },
-    { month: "Mar", value: 300 },
-    { month: "Apr", value: 250 },
-    { month: "May", value: 300 },
-    { month: "Jun", value: 20 },
-    { month: "Jul", value: 400 },
-    { month: "Aug", value: 250 },
-    { month: "Sep", value: 700 },
-    { month: "Oct", value: 50 },
-    { month: "Nov", value: 600 },
-    { month: "Dec", value: 155 },
-  ],
-  2022: [
-    { month: "Jan", value: 80 },
-    { month: "Feb", value: 130 },
-    { month: "Mar", value: 180 },
-    { month: "Apr", value: 230 },
-    { month: "May", value: 280 },
-    { month: "Jun", value: 330 },
-    { month: "Jul", value: 380 },
-    { month: "Aug", value: 430 },
-    { month: "Sep", value: 480 },
-    { month: "Oct", value: 530 },
-    { month: "Nov", value: 580 },
-    { month: "Dec", value: 630 },
-  ],
-};
+const MONTH_NAMES = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
 
 const BookingGrowth = () => {
-  const [year, setYear] = useState("2024");
+  const { data: userGrowthData, isLoading } = useGetOrderGrowthQuery();
+  const currentYear = new Date().getFullYear();
 
-  const handleYearChange = (value) => {
-    setYear(value);
-  };
+  const [year, setYear] = useState(currentYear);
+  const [years, setYears] = useState([]);
 
-  const items = [
-    { value: "2024", label: "2024" },
-    { value: "2023", label: "2023" },
-    { value: "2022", label: "2022" },
-  ];
+  useEffect(() => {
+    const startYear = 2024;
+    setYears(
+      Array.from(
+        { length: currentYear - startYear + 1 },
+        (_, i) => startYear + i
+      )
+    );
+  }, [currentYear]);
+
+  const { monthlyData, maxUsers } = useMemo(() => {
+    if (!userGrowthData?.data) {
+      return { monthlyData: [], maxUsers: 0 };
+    }
+
+    const formattedData = userGrowthData.data.map(item => ({
+      name: MONTH_NAMES[item.month - 1],
+      totalUser: item.total,
+    }));
+
+    const maxUsers =
+      Math.max(...formattedData.map(d => d.totalUser), 0) + 100;
+
+    return { monthlyData: formattedData, maxUsers };
+  }, [userGrowthData]);
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
-    <div className="">
-      {/* Header */}
-      <div className="flex justify-between items-center mb-4">
-        <p className="text-lg font-semibold text-gray-800">
-          Booking Growth
-        </p>
+    <div style={{ width: "100%", height: "100%" }}>
+      <div className="flex justify-between items-center">
+        <h3 className="font-bold text-lg">📈 Booking Growth</h3>
 
         <Select
-          defaultValue="2024"
-          onChange={handleYearChange}
-          options={items}
-          className="w-32"
+          value={year}
+          onChange={setYear}
+          options={years.map(y => ({ value: y, label: y }))}
+          style={{ width: 150 }}
         />
       </div>
 
-      {/* Chart */}
-      <div className="h-96">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={data[year]}
-            margin={{ top: 0, right: 0, left: 0, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#E63946" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#E63946" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#edc4c500" />
-            <XAxis dataKey="month" stroke="#6b7280"  tick={{ fontSize: 12, fontWeight: 500 }}/>
-            <YAxis stroke="#6b7280"  tick={{ fontSize: 12, fontWeight: 500 }}/>
-            <Tooltip
-              contentStyle={{ backgroundColor: "#fff", borderRadius: "8px" }}
-            />
-            <Area
-              type="monotone"
-              dataKey="value"
-              stroke="white"
-              fillOpacity={1}
-              fill="url(#colorValue)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
+      <ResponsiveContainer width="100%" height="90%">
+        <BarChart data={monthlyData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <XAxis dataKey="name" />
+          <YAxis domain={[0, maxUsers]} />
+          <Tooltip />
+          <Legend />
+
+          <defs>
+            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#E63946" stopOpacity={0.9} />
+              <stop offset="95%" stopColor="#ffd4d8" stopOpacity={0.7} />
+            </linearGradient>
+          </defs>
+
+          <Bar
+            dataKey="totalUser"
+            fill="url(#colorValue)"
+            barSize={45}
+            radius={[10, 10, 0, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

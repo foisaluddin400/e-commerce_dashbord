@@ -1,6 +1,9 @@
 import { Form, Input, message, Modal, Select, Spin, Upload } from "antd";
 import React, { useState } from "react";
-import { useAddsubCategoryMutation, useGetCategoryQuery } from "../redux/api/categoryApi";
+import {
+  useAddsubCategoryMutation,
+  useGetCategoryQuery,
+} from "../redux/api/categoryApi";
 // import { useAddSubCategoryMutation, useGetCategroyQuery } from "../redux/api/productManageApi";
 const onPreview = async (file) => {
   let src = file.url;
@@ -17,18 +20,17 @@ const onPreview = async (file) => {
   imgWindow?.document.write(image.outerHTML);
 };
 const AddSubCategories = ({ openAddModal, setOpenAddModal }) => {
-  
-const [addCategory] = useAddsubCategoryMutation()
+  const [addCategory] = useAddsubCategoryMutation();
   // const [addSubCategory] = useAddSubCategoryMutation();
   // const { data: category } = useGetCategroyQuery();
   // const formCategory = category?.data?.result || [];
 
   // Dummy categories
   //not category data up 20
-  const limit = 100
-  const page = 1
-  const{data:category} = useGetCategoryQuery({limit, page:page})
-  console.log(category)
+  const limit = 100;
+  const page = 1;
+  const { data: category } = useGetCategoryQuery({ limit, page: page });
+  console.log(category);
   const formCategory = category?.data;
 
   const [form] = Form.useForm();
@@ -38,7 +40,6 @@ const [addCategory] = useAddsubCategoryMutation()
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
-
 
   const handleCancel = () => {
     form.resetFields();
@@ -56,7 +57,7 @@ const [addCategory] = useAddsubCategoryMutation()
         formData.append("image", file.originFileObj);
       });
       formData.append("name", values.name);
-       formData.append("category", values.category);
+      formData.append("category", values.category);
 
       const res = await addCategory(formData);
       console.log(res);
@@ -95,7 +96,7 @@ const [addCategory] = useAddsubCategoryMutation()
             label="Category Name"
             rules={[{ required: true, message: "Please select a Category" }]}
           >
-          <Select  style={{ height:"40px" }} placeholder="Select">
+            <Select style={{ height: "40px" }} placeholder="Select">
               {formCategory?.map((cat) => (
                 <Select.Option key={cat?._id} value={cat?._id}>
                   {cat?.name}
@@ -107,45 +108,47 @@ const [addCategory] = useAddsubCategoryMutation()
           <Form.Item
             label="Sub Category Name"
             name="name"
-            rules={[{ required: true, message: "Please input Subcategory Name" }]}
+            rules={[
+              { required: true, message: "Please input Subcategory Name" },
+            ]}
           >
             <Input
               placeholder="Enter Subcategory Name"
-              style={{ height:"40px" }}
+              style={{ height: "40px" }}
             />
           </Form.Item>
 
-           <Form.Item label="Photos">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onChange={onChange}
-                onPreview={onPreview}
-                multiple={true}
-              >
-                {fileList.length < 1 && "+ Upload"}
-              </Upload>
-            </Form.Item>
+          <Form.Item label="Photos">
+            <Upload
+              listType="picture-card"
+              fileList={fileList}
+              onChange={onChange}
+              onPreview={onPreview}
+              multiple={true}
+            >
+              {fileList.length < 1 && "+ Upload"}
+            </Upload>
+          </Form.Item>
 
           <Form.Item>
-              <button
-                    className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
-                      loading
-                        ? "bg-[#fa8e97] cursor-not-allowed"
-                        : "bg-[#E63946] hover:bg-[#941822]"
-                    }`}
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {loading ? (
-                      <>
-                        <Spin size="small" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      "Submit"
-                    )}
-                  </button>
+            <button
+              className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+                loading
+                  ? "bg-[#fa8e97] cursor-not-allowed"
+                  : "bg-[#E63946] hover:bg-[#941822]"
+              }`}
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Spin size="small" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                "Submit"
+              )}
+            </button>
           </Form.Item>
         </Form>
       </div>

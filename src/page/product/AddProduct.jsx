@@ -8,6 +8,7 @@ import {
   Input,
   Select,
   message,
+  Popconfirm,
 } from "antd";
 import {
   EyeOutlined,
@@ -68,10 +69,35 @@ const AddProduct = () => {
       price: variantProduct?.data?.price,
       discountPrice: variantProduct?.data?.discountPercentage,
       size: variant?.size?.map((s) => s.name).join(", "),
-      fontImage: `${imageUrl}/${variant?.frontImage}`,
-      backImage: `${imageUrl}/${variant?.backImage}`,
-      rightImage: `${imageUrl}/${variant?.rightImage}`,
-      leftImage: `${imageUrl}/${variant?.leftImage}`,
+
+      fontImage: variant?.frontImage
+        ? `${imageUrl}${variant?.frontImage}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+     
+
+      backImage: variant?.backImage
+        ? `${imageUrl}${variant?.backImage}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+
+
+      
+
+      rightImage: variant?.rightImage
+        ? `${imageUrl}${variant?.rightImage}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+
+
+
+  leftImage: variant?.leftImage
+        ? `${imageUrl}${variant?.leftImage}`
+        : "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y",
+
+
+
+      
       category: variantProduct?.data?.category?.name,
       subcategory: variantProduct?.data?.subcategory?.name,
       color: variant?.color,
@@ -265,11 +291,17 @@ const AddProduct = () => {
               icon={<EditOutlined />}
             />
           </Link>
-          <Button
-            onClick={() => handleDelete(record.id)}
-            className="bg-[#E63946] text-white border-none"
-            icon={<DeleteOutlined />}
-          />
+          <Popconfirm
+            title="Are you sure to delete this Product?"
+            okText="Yes"
+            cancelText="No"
+            onConfirm={() => handleDelete(record.id)}
+          >
+            <Button
+              className="bg-[#E63946] text-white border-none"
+              icon={<DeleteOutlined />}
+            />
+          </Popconfirm>
         </Space>
       ),
     },
@@ -280,22 +312,6 @@ const AddProduct = () => {
       <div className="flex justify-between mb-4">
         <Navigate title={"Products Verients"} />
         <div className="flex gap-5">
-          <div>
-            <Select
-              style={{ height: "40px" }}
-              placeholder="Select Category"
-              // onChange={() => setShowStatus(true)}
-            >
-              <Option value="clothing">Clothing</Option>
-              <Option value="electronics">Electronics</Option>
-              <Option value="accessories">Accessories</Option>
-            </Select>
-          </div>
-          <Input
-            placeholder="Search by name..."
-            prefix={<SearchOutlined />}
-            style={{ maxWidth: "500px", height: "40px" }}
-          />
           <div>
             <Link to={`/dashboard/add-verient/${id}`}>
               {" "}
