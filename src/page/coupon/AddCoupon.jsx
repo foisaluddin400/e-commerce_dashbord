@@ -133,19 +133,23 @@ const AddCoupon = ({ openAddModal, setOpenAddModal }) => {
         </Form.Item>
 
         {/* Category */}
-        <Form.Item
-          label="Category"
-          name="category"
-          rules={[{ required: false }]}
-        >
-          <Select placeholder="Select category">
-            {categoryData?.data?.map((cat) => (
-              <Option key={cat._id} value={cat._id}>
-                {cat.name}
-              </Option>
-            ))}
-          </Select>
-        </Form.Item>
+       <Form.Item
+  label="Category"
+  name="category"
+  rules={[{ required: false }]}
+>
+  <Select
+    placeholder="Select category"
+    allowClear   
+  >
+    {categoryData?.data?.map((cat) => (
+      <Select.Option key={cat._id} value={cat._id}>
+        {cat.name}
+      </Select.Option>
+    ))}
+  </Select>
+</Form.Item>
+
 
         {/* Quantity Type */}
         <Form.Item label="Quantity Type">
