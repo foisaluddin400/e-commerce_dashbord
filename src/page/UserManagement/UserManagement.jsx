@@ -57,7 +57,7 @@ const UserManagement = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const openModal = (record) => {
-    setSelectedUser(record);
+   
     setOpen(true);
   };
 

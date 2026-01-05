@@ -1,4 +1,13 @@
-import { Table, Input, Space, message, Image, Select, Pagination, Popconfirm } from "antd";
+import {
+  Table,
+  Input,
+  Space,
+  message,
+  Image,
+  Select,
+  Pagination,
+  Popconfirm,
+} from "antd";
 import { DeleteOutlined, SearchOutlined } from "@ant-design/icons";
 import { MdModeEditOutline } from "react-icons/md";
 import { LuEye } from "react-icons/lu";
@@ -23,10 +32,12 @@ const MainProduct = () => {
   const { data: category } = useGetCategoryQuery({ limit, page: page });
   console.log(category);
   const formCategory = category?.data;
-  const { data: allProduct } = useGetProductQuery({  search,
-  page: currentPage,
-  limit: pageSize,
-  category: selectedCategory, });
+  const { data: allProduct } = useGetProductQuery({
+    search,
+    page: currentPage,
+    limit: pageSize,
+    category: selectedCategory,
+  });
   const [deleteData] = useDeleteProductMutation();
 
   const navigate = useNavigate();
@@ -50,7 +61,7 @@ const MainProduct = () => {
       brand: item.brand?.brandName,
       subcategory: item.subcategory?.name,
       price: item.price,
-      thumbnail: `${imageUrl}/${item.thumbnail}`,
+      thumbnail: `${imageUrl}${item.thumbnail}`,
       discountPrice: item.discountPercentage,
       variant: item.variants?.length || 0,
     })) || [];
@@ -90,18 +101,15 @@ const MainProduct = () => {
               </span>
             </button>
           </Link>
-              <Popconfirm
+          <Popconfirm
             title="Are you sure to delete this Product Category?"
             okText="Yes"
             cancelText="No"
             onConfirm={() => handleDelete(record.key)}
           >
-          <button
-            className="bg-[#E63946] text-white w-9 h-9 flex justify-center items-center rounded text-xl"
-         
-          >
-            <DeleteOutlined />
-          </button>
+            <button className="bg-[#E63946] text-white w-9 h-9 flex justify-center items-center rounded text-xl">
+              <DeleteOutlined />
+            </button>
           </Popconfirm>
         </Space>
       ),
@@ -114,26 +122,25 @@ const MainProduct = () => {
         <Navigate title={"Products Info"} />
         <div className="flex gap-5">
           <div>
-           <Select
-  style={{ height: "40px", width: "180px" }}
-  placeholder="Filter Category"
-  allowClear
-  value={selectedCategory || undefined}
-  onChange={(value) => {
-    setSelectedCategory(value || "");
-    setCurrentPage(1);
-  }}
->
-  {formCategory?.map((cat) => (
-    <Select.Option key={cat._id} value={cat._id}>
-      {cat.name}
-    </Select.Option>
-  ))}
-</Select>
-
+            <Select
+              style={{ height: "40px", width: "180px" }}
+              placeholder="Filter Category"
+              allowClear
+              value={selectedCategory || undefined}
+              onChange={(value) => {
+                setSelectedCategory(value || "");
+                setCurrentPage(1);
+              }}
+            >
+              {formCategory?.map((cat) => (
+                <Select.Option key={cat._id} value={cat._id}>
+                  {cat.name}
+                </Select.Option>
+              ))}
+            </Select>
           </div>
           <Input
-           onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name..."
             prefix={<SearchOutlined />}
             style={{ maxWidth: "600px", height: "40px" }}
@@ -157,15 +164,15 @@ const MainProduct = () => {
         rowClassName={() => "border-b border-gray-200"}
       />
 
-           <div className="mt-4 flex justify-center">
-              <Pagination
-                current={currentPage}
-                pageSize={pageSize}
-                total={allProduct?.meta?.total || 0}
-                onChange={handlePageChange}
-                showSizeChanger={false}
-              />
-            </div>
+      <div className="mt-4 flex justify-center">
+        <Pagination
+          current={currentPage}
+          pageSize={pageSize}
+          total={allProduct?.meta?.total || 0}
+          onChange={handlePageChange}
+          showSizeChanger={false}
+        />
+      </div>
     </div>
   );
 };
