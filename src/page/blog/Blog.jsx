@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Navigate } from "../../Navigate";
+import { Navigate } from "../../Navigate"; // adjust path if needed
 import { Input, Modal, Form, Upload, Spin, message, Pagination } from "antd";
 import {
   SearchOutlined,
@@ -8,7 +8,6 @@ import {
   PlusOutlined,
 } from "@ant-design/icons";
 import JoditEditor from "jodit-react";
-
 import {
   useAddBlogsMutation,
   useDeleteBlogsMutation,
@@ -23,11 +22,13 @@ const Blog = () => {
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+
   const { data: blogData, refetch } = useGetBlogsQuery({
     search,
     page: currentPage,
     limit: pageSize,
   });
+
   const [addBlogs] = useAddBlogsMutation();
   const [updateBlogs] = useUpdateBlogsMutation();
   const [deleteBlogs] = useDeleteBlogsMutation();
@@ -63,31 +64,75 @@ const Blog = () => {
       message.success(res.message);
       refetch();
     } catch (err) {
-      message.error(err?.data?.message);
+      message.error(err?.data?.message || "Failed to delete");
     }
+  };
+
+  const config = {
+    readonly: false,
+    placeholder: "Start typing...",
+    height: 600,
+    width: "100%",
+    buttons: [
+      "undo",
+      "redo",
+      "|",
+      "bold",
+      "italic",
+      "underline",
+      "strikethrough",
+      "|",
+      "fontsize",
+      "font",
+      "brush",
+      "|",
+      "align",
+      "outdent",
+      "indent",
+      "|",
+      "ul",
+      "ol",
+      "|",
+      "table",
+      "|",
+      "image",
+      "link",
+      "|",
+      "hr",
+      "eraser",
+      "copyformat",
+      "|",
+      "fullsize",
+      "preview",
+    ],
+    toolbarAdaptive: false,
+    toolbarSticky: true,
   };
 
   const handleAdd = async (values) => {
     setLoading(true);
     try {
       const formData = new FormData();
-
-      fileList.forEach((file) => {
-        formData.append("image", file.originFileObj);
-      });
-
+      if (fileList.length > 0) {
+        formData.append("image", fileList[0].originFileObj);
+      }
       formData.append("title", values.title);
       formData.append("content", content);
 
+      // Debug (uncomment when needed)
+      // console.log("Adding → Title:", values.title);
+      // console.log("Content length:", content?.length);
+      // console.log("Content preview:", content?.substring(0, 150));
+
       const res = await addBlogs(formData).unwrap();
-      message.success(res.message);
+      message.success(res.message || "Blog added successfully");
       setOpenAddModal(false);
       form.resetFields();
       setFileList([]);
       setContent("");
       refetch();
     } catch (err) {
-      message.error(err?.data?.message);
+      message.error(err?.data?.message || "Failed to add blog");
     } finally {
       setLoading(false);
     }
@@ -98,19 +143,24 @@ const Blog = () => {
     try {
       const formData = new FormData();
 
-      if (fileList[0]?.originFileObj) {
+      // Only append new image if user selected one
+      if (fileList.length > 0 && fileList[0].originFileObj) {
         formData.append("image", fileList[0].originFileObj);
       }
 
       formData.append("title", values.title);
       formData.append("content", content);
 
+      // Debug (uncomment when needed)
+      // console.log("Editing → Title:", values.title);
+      // console.log("Content length:", content?.length);
+
       const res = await updateBlogs({
         id: selectedBlog._id,
         data: formData,
       }).unwrap();
 
-      message.success(res.message);
+      message.success(res.message || "Blog updated successfully");
       setOpenEditModal(false);
       form.resetFields();
       setFileList([]);
@@ -118,12 +168,14 @@ const Blog = () => {
       setSelectedBlog(null);
       refetch();
     } catch (err) {
-      message.error(err?.data?.message);
+      message.error(err?.data?.message || "Failed to update blog");
     } finally {
       setLoading(false);
     }
   };
+
   const handlePageChange = (page) => setCurrentPage(page);
+
   return (
     <div className="bg-white p-3 h-[87vh] overflow-auto">
       <div className="flex justify-between mb-4">
@@ -135,72 +187,64 @@ const Blog = () => {
             prefix={<SearchOutlined />}
             style={{ maxWidth: "500px", height: "40px" }}
           />
-          <div>
-            <button
-              onClick={() => setOpenAddModal(true)}
-              className="bg-[#E63946] w-[150px] text-white py-2 rounded"
-            >
-              Add Blog
-            </button>
-          </div>
+          <button
+            onClick={() => setOpenAddModal(true)}
+            className="bg-[#E63946] w-[150px] text-white py-2 rounded hover:bg-[#c62839] transition"
+          >
+            Add Blog
+          </button>
         </div>
       </div>
 
       {/* Blog Cards */}
-      <div className="grid grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {blogData?.data?.map((blog) => (
-          <div key={blog._id} className="border rounded p-2 flex flex-col">
+          <div key={blog._id} className="border rounded-lg p-3 flex flex-col shadow-sm hover:shadow-md transition">
             <img
               src={`${imageUrl}${blog.imageUrl}`}
               alt={blog.title}
-              className="h-60 w-full object-cover rounded"
+              className="h-80 w-full object-cover rounded mb-3"
             />
-            <h3 className="font-semibold mt-3 line-clamp-2">{blog.title}</h3>
-            <div className="flex justify-end gap-2 mt-4">
-              <div
+            <h3 className="font-semibold text-lg line-clamp-2 mb-3">{blog.title}</h3>
+            <div className="flex justify-end gap-2 mt-auto">
+              <button
                 onClick={() => {
                   setSelectedBlog(blog);
                   form.setFieldsValue({ title: blog.title });
-                  setContent(blog.content);
+                  setContent(blog.content || "");
                   setFileList([
                     {
                       uid: "-1",
-                      name: blog.imageUrl,
+                      name: blog.imageUrl.split("/").pop() || "image.jpg",
                       status: "done",
                       url: `${imageUrl}${blog.imageUrl}`,
                     },
                   ]);
                   setOpenEditModal(true);
                 }}
-                className="bg-green-600 cursor-pointer text-white py-1 px-3 rounded"
+                className="bg-green-600 text-white py-1 px-3 rounded hover:bg-green-700"
               >
-                <button>
-                  <EditOutlined />
-                </button>
-              </div>
+                <EditOutlined />
+              </button>
 
-              <div
+              <button
                 onClick={() => handleDelete(blog._id)}
-                className="bg-red-600 cursor-pointer text-white py-1 px-3 rounded"
+                className="bg-red-600 text-white py-1 px-3 rounded hover:bg-red-700"
               >
-                <button>
-                  <DeleteOutlined />
-                </button>
-              </div>
+                <DeleteOutlined />
+              </button>
+
               <Link to={`/dashboard/blog-details/${blog?._id}`}>
-                {" "}
-                <div className="bg-sky-500 cursor-pointer text-white py-1 px-3 rounded">
-                  <button>
-                    <EyeIcon></EyeIcon>
-                  </button>
-                </div>
+                <button className="bg-sky-500 text-white py-1 px-3 rounded hover:bg-sky-600">
+                  <EyeIcon size={16} />
+                </button>
               </Link>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex justify-center">
+      <div className="mt-6 flex justify-center">
         <Pagination
           current={currentPage}
           pageSize={pageSize}
@@ -216,32 +260,47 @@ const Blog = () => {
         open={openAddModal}
         onCancel={() => setOpenAddModal(false)}
         footer={null}
-        width={600}
+        width={'100%'}
       >
-        <h2 className="text-center font-bold mb-6">+ Add Blog</h2>
+        <h2 className="text-center font-bold text-xl mb-6">+ Add New Blog</h2>
         <Form form={form} layout="vertical" onFinish={handleAdd}>
           <Form.Item
             label="Title"
             name="title"
-            rules={[{ required: true, message: "Please enter title" }]}
+            rules={[{ required: true, message: "Please enter blog title" }]}
           >
-            <Input placeholder="Title" style={{ height: "40px" }} />
+            <Input placeholder="Blog title" style={{ height: "40px" }} />
           </Form.Item>
-          <Form.Item label="Image">
+
+          <Form.Item label="Cover Image">
             <Upload
               listType="picture-card"
               fileList={fileList}
-              onChange={({ fileList }) => setFileList(fileList)}
+              onChange={({ fileList: newFileList }) => setFileList(newFileList)}
               onPreview={onPreview}
+              maxCount={1}
+              beforeUpload={() => false} // prevent auto upload
             >
-              {fileList.length < 1 && <PlusOutlined />}
+              {fileList.length < 1 && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
             </Upload>
           </Form.Item>
+
           <Form.Item label="Content">
-            <JoditEditor value={content} onBlur={setContent} />
+            <JoditEditor
+              config={config}
+              value={content}
+              onBlur={(newContent) => setContent(newContent)}
+              // tabIndex={1} // optional: enables tab navigation
+            />
           </Form.Item>
+
           <button
-            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all ${
               loading
                 ? "bg-[#fa8e97] cursor-not-allowed"
                 : "bg-[#E63946] hover:bg-[#941822]"
@@ -255,7 +314,7 @@ const Blog = () => {
                 <span>Submitting...</span>
               </>
             ) : (
-              "Submit"
+              "Create Blog"
             )}
           </button>
         </Form>
@@ -267,32 +326,46 @@ const Blog = () => {
         open={openEditModal}
         onCancel={() => setOpenEditModal(false)}
         footer={null}
-        width={600}
+      width={'100%'}
       >
-        <h2 className="text-center font-bold mb-6">Update Blog</h2>
+        <h2 className="text-center font-bold text-xl mb-6">Edit Blog</h2>
         <Form form={form} layout="vertical" onFinish={handleEdit}>
           <Form.Item
             label="Title"
             name="title"
-            rules={[{ required: true, message: "Please enter title" }]}
+            rules={[{ required: true, message: "Please enter blog title" }]}
           >
-            <Input placeholder="Title" style={{ height: "40px" }} />
+            <Input placeholder="Blog title" style={{ height: "40px" }} />
           </Form.Item>
-          <Form.Item label="Image">
+
+          <Form.Item label="Cover Image">
             <Upload
               listType="picture-card"
               fileList={fileList}
-              onChange={({ fileList }) => setFileList(fileList)}
+              onChange={({ fileList: newFileList }) => setFileList(newFileList)}
               onPreview={onPreview}
+              maxCount={1}
+              beforeUpload={() => false}
             >
-              {fileList.length < 1 && <PlusOutlined />}
+              {fileList.length < 1 && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload new</div>
+                </div>
+              )}
             </Upload>
           </Form.Item>
+
           <Form.Item label="Content">
-            <JoditEditor value={content} onBlur={setContent} />
+            <JoditEditor
+              config={config}
+              value={content}
+              onBlur={(newContent) => setContent(newContent)}
+            />
           </Form.Item>
+
           <button
-            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all duration-300 ${
+            className={`w-full py-3 rounded text-white flex justify-center items-center gap-2 transition-all ${
               loading
                 ? "bg-[#fa8e97] cursor-not-allowed"
                 : "bg-[#E63946] hover:bg-[#941822]"
@@ -303,10 +376,10 @@ const Blog = () => {
             {loading ? (
               <>
                 <Spin size="small" />
-                <span>Submitting...</span>
+                <span>Updating...</span>
               </>
             ) : (
-              "Submit"
+              "Update Blog"
             )}
           </button>
         </Form>
